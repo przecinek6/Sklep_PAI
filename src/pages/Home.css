@@ -3,34 +3,30 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--surface);
   padding: 20px;
 }
 
 .home-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: var(--background);
+  border: 1px solid var(--border);
   border-radius: 24px;
   padding: 48px 40px;
   width: 100%;
   max-width: 600px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
 .home-card h1 {
   font-size: 36px;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--text-primary);
   margin: 0 0 32px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .user-info {
-  background: #f7fafc;
+  background: var(--surface);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 32px;
@@ -39,29 +35,52 @@
 
 .user-info p {
   margin: 12px 0;
-  color: #2d3748;
+  color: var(--text-secondary);
   font-size: 16px;
 }
 
 .user-info strong {
-  color: #1a202c;
+  color: var(--text-primary);
+}
+
+.home-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.admin-link {
+  display: inline-block;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.admin-link:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .sign-out-button {
   padding: 14px 32px;
   font-size: 16px;
   font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 32px;
+  transition: all 0.2s ease;
 }
 
 .sign-out-button:hover {
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  background: var(--border);
 }
 
 .coming-soon {
@@ -81,27 +100,102 @@
   font-size: 16px;
 }
 
+/* Suspended Account Card */
+.suspended-card {
+  background: var(--background);
+  border: 2px solid rgb(239, 68, 68);
+  border-radius: 24px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.suspended-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.suspended-card h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: rgb(239, 68, 68);
+  margin: 0 0 32px 0;
+}
+
+.suspended-info {
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+.suspended-info p {
+  margin: 12px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.suspended-info strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.ban-reason {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 16px !important;
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  margin: 16px 0 !important;
+  word-break: break-word;
+}
+
+.help-text {
+  font-size: 13px !important;
+  color: var(--text-secondary) !important;
+  font-style: italic;
+  margin-top: 20px !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-  .home-card {
+  .home-card,
+  .suspended-card {
     padding: 36px 28px;
   }
 
-  .home-card h1 {
+  .home-card h1,
+  .suspended-card h1 {
     font-size: 28px;
   }
 
   .user-info p {
     font-size: 14px;
   }
+
+  .suspended-icon {
+    font-size: 48px;
+  }
 }
 
 @media (max-width: 480px) {
-  .home-card {
+  .home-card,
+  .suspended-card {
     padding: 28px 20px;
   }
 
-  .home-card h1 {
+  .home-card h1,
+  .suspended-card h1 {
     font-size: 24px;
+  }
+
+  .suspended-icon {
+    font-size: 40px;
   }
 }
