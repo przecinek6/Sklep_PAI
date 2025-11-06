@@ -3,7 +3,10 @@ import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import './Login.css';
 
+type AuthMode = 'login' | 'register';
+
 export const Login = () => {
+  const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,34 +27,41 @@ export const Login = () => {
     }
   }, [email]);
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Validate inputs (protection against SQL injection - using Supabase client)
+      // Validate inputs
       if (!email.trim() || !password.trim()) {
-        throw new Error('Email and password are required');
+        throw new Error('Email i hasło są wymagane');
       }
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        throw new Error('Please enter a valid email address');
+        throw new Error('Podaj poprawny adres email');
       }
 
-      // Try to sign in (Supabase uses prepared statements internally)
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (error) throw error;
-
-      // Redirect will happen automatically via auth state change
+      if (mode === 'login') {
+        // Sign in
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+        if (error) throw error;
+      } else {
+        // Sign up
+        const { error } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+        });
+        if (error) throw error;
+        setError('Sprawdź swój email, aby potwierdzić konto');
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'Wystąpił błąd');
     } finally {
       setLoading(false);
     }
@@ -71,60 +81,44 @@ export const Login = () => {
 
       if (error) throw error;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'Wystąpił błąd');
       setLoading(false);
     }
   };
 
   return (
     <div className="login-container">
-      {/* Animated background particles */}
-      <div className="particles">
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="particle"
-            animate={{
-              y: [0, -1000],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: Math.random() * 10 + 10,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-            }}
-            style={{
-              left: `${Math.random() * 100}%`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Animated background */}
+      <div className="background-pattern" />
 
       <motion.div
         className="login-card"
-        initial={{ opacity: 0, y: -50, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{
-          duration: 0.8,
-          ease: [0.22, 1, 0.36, 1],
-        }}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
-        <motion.div
-          className="login-header"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          <h1>Welcome Back</h1>
-          <p>Sign in to continue</p>
-        </motion.div>
+        {/* Header with logo and tabs */}
+        <div className="login-header">
+          <h1 className="logo">Sklep PAI</h1>
+          <div className="tabs">
+            <button
+              className={`tab ${mode === 'login' ? 'active' : ''}`}
+              onClick={() => setMode('login')}
+              type="button"
+            >
+              Logowanie
+            </button>
+            <button
+              className={`tab ${mode === 'register' ? 'active' : ''}`}
+              onClick={() => setMode('register')}
+              type="button"
+            >
+              Nowe konto
+            </button>
+          </div>
+        </div>
 
-        <motion.form
-          onSubmit={handleEmailLogin}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
+        <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <input
               type="email"
@@ -140,7 +134,7 @@ export const Login = () => {
           <div className="form-group">
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Hasło"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
@@ -150,42 +144,30 @@ export const Login = () => {
           </div>
 
           {error && (
-            <motion.div
-              className="error-message"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
+            <div className={`message ${error.includes('Sprawdź') ? 'success' : 'error'}`}>
               {error}
-            </motion.div>
+            </div>
           )}
 
-          <motion.button
-            type="submit"
-            className="login-button"
-            disabled={loading}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </motion.button>
-        </motion.form>
+          <button type="submit" className="submit-button" disabled={loading}>
+            {loading
+              ? 'Ładowanie...'
+              : mode === 'login'
+              ? 'Zaloguj się'
+              : 'Utwórz konto'}
+          </button>
+        </form>
 
         <div className="divider">
           <span>lub</span>
         </div>
 
-        <motion.div
-          className="oauth-buttons"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 0.6 }}
-        >
-          <motion.button
+        <div className="oauth-buttons">
+          <button
             className="oauth-button google"
             onClick={() => handleOAuthLogin('google')}
             disabled={loading}
-            whileHover={{ scale: 1.05, boxShadow: '0 8px 25px rgba(66, 133, 244, 0.3)' }}
-            whileTap={{ scale: 0.95 }}
+            type="button"
           >
             <svg className="oauth-icon" viewBox="0 0 24 24">
               <path
@@ -205,15 +187,14 @@ export const Login = () => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continue with Google
-          </motion.button>
+            Zaloguj przez Google
+          </button>
 
-          <motion.button
+          <button
             className="oauth-button github"
             onClick={() => handleOAuthLogin('github')}
             disabled={loading}
-            whileHover={{ scale: 1.05, boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)' }}
-            whileTap={{ scale: 0.95 }}
+            type="button"
           >
             <svg className="oauth-icon" viewBox="0 0 24 24">
               <path
@@ -221,9 +202,9 @@ export const Login = () => {
                 d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"
               />
             </svg>
-            Continue with GitHub
-          </motion.button>
-        </motion.div>
+            Zaloguj przez GitHub
+          </button>
+        </div>
       </motion.div>
     </div>
   );
