@@ -24,17 +24,16 @@ export const ProductManager = () => {
     name: '',
     slug: '',
     description: '',
-    short_description: '',
     price: 0,
-    compare_at_price: 0,
     stock_quantity: 0,
-    sku: '',
     category_id: null as string | null,
     is_active: true,
     is_featured: false,
   });
 
   const [images, setImages] = useState<ImageFile[]>([]);
+  const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     loadProducts();
@@ -94,7 +93,7 @@ export const ProductManager = () => {
     setFormData({
       ...formData,
       name,
-      slug: editingProduct ? formData.slug : generateSlug(name),
+      slug: generateSlug(name), // Zawsze generuj slug automatycznie
     });
   };
 
@@ -152,6 +151,50 @@ export const ProductManager = () => {
     });
   };
 
+  // Drag and drop dla zmiany kolejności zdjęć
+  const handleImageDragStart = (index: number) => {
+    setDraggedImageIndex(index);
+  };
+
+  const handleImageDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedImageIndex === null || draggedImageIndex === index) return;
+
+    const newImages = [...images];
+    const draggedImage = newImages[draggedImageIndex];
+    newImages.splice(draggedImageIndex, 1);
+    newImages.splice(index, 0, draggedImage);
+
+    setImages(newImages);
+    setDraggedImageIndex(index);
+  };
+
+  const handleImageDragEnd = () => {
+    setDraggedImageIndex(null);
+  };
+
+  // Funkcje do edytora HTML
+  const insertHtmlTag = (tagStart: string, tagEnd: string = '') => {
+    const textarea = descriptionRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = formData.description.substring(start, end);
+    const beforeText = formData.description.substring(0, start);
+    const afterText = formData.description.substring(end);
+
+    const newText = beforeText + tagStart + selectedText + tagEnd + afterText;
+    setFormData({ ...formData, description: newText });
+
+    // Ustaw kursor po wstawionym tagu
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + tagStart.length + selectedText.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -166,11 +209,8 @@ export const ProductManager = () => {
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            short_description: formData.short_description || null,
             price: formData.price,
-            compare_at_price: formData.compare_at_price || null,
             stock_quantity: formData.stock_quantity,
-            sku: formData.sku || null,
             category_id: formData.category_id,
             is_active: formData.is_active,
             is_featured: formData.is_featured,
@@ -187,11 +227,8 @@ export const ProductManager = () => {
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            short_description: formData.short_description || null,
             price: formData.price,
-            compare_at_price: formData.compare_at_price || null,
             stock_quantity: formData.stock_quantity,
-            sku: formData.sku || null,
             category_id: formData.category_id,
             is_active: formData.is_active,
             is_featured: formData.is_featured,
@@ -281,11 +318,8 @@ export const ProductManager = () => {
       name: product.name,
       slug: product.slug,
       description: product.description || '',
-      short_description: product.short_description || '',
       price: product.price,
-      compare_at_price: product.compare_at_price || 0,
       stock_quantity: product.stock_quantity,
-      sku: product.sku || '',
       category_id: product.category_id || null,
       is_active: product.is_active,
       is_featured: product.is_featured,
@@ -299,11 +333,8 @@ export const ProductManager = () => {
       name: '',
       slug: '',
       description: '',
-      short_description: '',
       price: 0,
-      compare_at_price: 0,
       stock_quantity: 0,
-      sku: '',
       category_id: null,
       is_active: true,
       is_featured: false,
@@ -340,57 +371,119 @@ export const ProductManager = () => {
           <div className="form-section">
             <h3>Podstawowe informacje</h3>
             
-            <div className="form-row">
-              <div className="form-group">
-                <label>Nazwa produktu *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder="np. iPhone 15 Pro"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Slug (URL) *</label>
-                <input
-                  type="text"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="iphone-15-pro"
-                  pattern="^[a-z0-9-]+$"
-                  required
-                />
-                <small>Tylko małe litery, cyfry i myślniki</small>
-              </div>
-            </div>
-
             <div className="form-group">
-              <label>Krótki opis</label>
+              <label>Nazwa produktu *</label>
               <input
                 type="text"
-                value={formData.short_description}
-                onChange={(e) => setFormData({ ...formData, short_description: e.target.value })}
-                placeholder="Krótki opis wyświetlany na liście produktów"
-                maxLength={500}
+                value={formData.name}
+                onChange={(e) => handleNameChange(e.target.value)}
+                required
               />
+              {formData.name && (
+                <small style={{ color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
+                  URL: {formData.slug || 'będzie wygenerowany automatycznie'}
+                </small>
+              )}
             </div>
 
             <div className="form-group">
-              <label>Pełny opis</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Szczegółowy opis produktu"
-                rows={5}
-              />
+              <label>Opis</label>
+              <div className="html-editor">
+                <div className="editor-toolbar">
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<b>', '</b>')}
+                    title="Pogrubienie"
+                  >
+                    <strong>B</strong>
+                  </button>
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<i>', '</i>')}
+                    title="Kursywa"
+                  >
+                    <em>I</em>
+                  </button>
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<u>', '</u>')}
+                    title="Podkreślenie"
+                  >
+                    <u>U</u>
+                  </button>
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<h2>', '</h2>')}
+                    title="Nagłówek 2"
+                  >
+                    H2
+                  </button>
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<h3>', '</h3>')}
+                    title="Nagłówek 3"
+                  >
+                    H3
+                  </button>
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<p>', '</p>')}
+                    title="Paragraf"
+                  >
+                    P
+                  </button>
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<br/>')}
+                    title="Nowa linia"
+                  >
+                    BR
+                  </button>
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<ul>\n  <li>', '</li>\n</ul>')}
+                    title="Lista punktowana"
+                  >
+                    UL
+                  </button>
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<ol>\n  <li>', '</li>\n</ol>')}
+                    title="Lista numerowana"
+                  >
+                    OL
+                  </button>
+                  <button 
+                    type="button" 
+                    className="editor-btn" 
+                    onClick={() => insertHtmlTag('<a href="">', '</a>')}
+                    title="Link"
+                  >
+                    A
+                  </button>
+                </div>
+                <textarea
+                  ref={descriptionRef}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Szczegółowy opis produktu z obsługą HTML"
+                  rows={8}
+                  className="html-textarea"
+                />
+              </div>
             </div>
           </div>
 
           <div className="form-section">
-            <h3>Cena i magazyn</h3>
-            
             <div className="form-row">
               <div className="form-group">
                 <label>Cena *</label>
@@ -405,18 +498,7 @@ export const ProductManager = () => {
               </div>
 
               <div className="form-group">
-                <label>Cena przed rabatem</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.compare_at_price}
-                  onChange={(e) => setFormData({ ...formData, compare_at_price: parseFloat(e.target.value) || 0 })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Stan magazynowy *</label>
+                <label>Ilość *</label>
                 <input
                   type="number"
                   min="0"
@@ -425,25 +507,14 @@ export const ProductManager = () => {
                   required
                 />
               </div>
-
-              <div className="form-group">
-                <label>SKU</label>
-                <input
-                  type="text"
-                  value={formData.sku}
-                  onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                  placeholder="Kod produktu"
-                />
-              </div>
             </div>
           </div>
 
           <div className="form-section">
-            <h3>Kategoria i status</h3>
+            <h3>Kategoria </h3>
             
             <div className="form-row">
               <div className="form-group">
-                <label>Kategoria</label>
                 <select
                   value={formData.category_id || ''}
                   onChange={(e) => setFormData({ ...formData, category_id: e.target.value || null })}
@@ -455,30 +526,6 @@ export const ProductManager = () => {
                     </option>
                   ))}
                 </select>
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_active}
-                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  />
-                  <span>Aktywny (widoczny w sklepie)</span>
-                </label>
-              </div>
-
-              <div className="form-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_featured}
-                    onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                  />
-                  <span>Wyróżniony (promowany)</span>
-                </label>
               </div>
             </div>
           </div>
@@ -533,16 +580,25 @@ export const ProductManager = () => {
 
             {images.length > 0 && (
               <div className="images-preview">
-                {images.map(image => (
-                  <div key={image.id} className="image-preview-item">
+                {images.map((image, index) => (
+                  <div 
+                    key={image.id} 
+                    className={`image-preview-item ${draggedImageIndex === index ? 'dragging' : ''}`}
+                    draggable
+                    onDragStart={() => handleImageDragStart(index)}
+                    onDragOver={(e) => handleImageDragOver(e, index)}
+                    onDragEnd={handleImageDragEnd}
+                  >
+                    <div className="drag-handle">⋮⋮</div>
                     <img src={image.preview} alt="Preview" />
                     <button
                       type="button"
                       className="remove-image"
                       onClick={() => removeImage(image.id)}
                     >
-                      Usuń
+                      X
                     </button>
+                    <span className="image-order">{index + 1}</span>
                   </div>
                 ))}
               </div>
