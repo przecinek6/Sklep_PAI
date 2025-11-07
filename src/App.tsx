@@ -4,6 +4,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { Login } from './pages/Login';
 import { Home } from './pages/Home';
 import { AdminPanel } from './pages/AdminPanel';
+import { Shop } from './pages/Shop';
 import './App.css';
 
 function App() {
@@ -36,11 +37,35 @@ function App() {
           />
           <Route
             path="/"
+            element={<Shop />}
+          />
+          <Route
+            path="/profile"
             element={user ? <Home /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/orders"
+            element={user ? <div>Moje zamówienia - w budowie</div> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/settings"
+            element={user ? <div>Ustawienia - w budowie</div> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/moderator"
+            element={user ? <div>Panel moderatora - w budowie</div> : <Navigate to="/login" replace />}
           />
           <Route
             path="/admin"
             element={user ? <AdminPanel /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/cart"
+            element={<div>Koszyk - w budowie</div>}
+          />
+          <Route
+            path="/search"
+            element={<div>Wyszukiwanie - w budowie</div>}
           />
         </Routes>
       </Router>
