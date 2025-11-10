@@ -106,7 +106,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
-  width: 100%;
+  width: auto;
 }
 
 .admin-nav-btn.btn-home {
@@ -158,6 +158,12 @@
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  .admin-content {
+    padding: 24px;
+  }
+}
+
 @media (max-width: 1024px) {
   .admin-sidebar {
     width: 240px;
@@ -166,6 +172,7 @@
   .admin-content {
     margin-left: 240px;
     width: calc(100% - 240px);
+    padding: 20px;
   }
 
   .sidebar-header {
@@ -175,13 +182,23 @@
   .sidebar-header h2 {
     font-size: 18px;
   }
+
+  .admin-nav {
+    padding: 16px 12px;
+  }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+  .admin-panel {
+    flex-direction: column;
+  }
+
   .admin-sidebar {
     width: 100%;
     height: auto;
-    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 100;
     border-right: none;
     border-bottom: 1px solid var(--border);
   }
@@ -192,27 +209,94 @@
     padding: 20px 16px;
   }
 
+  .sidebar-header {
+    padding: 16px;
+  }
+
   .sidebar-header h2 {
     font-size: 18px;
+    margin-bottom: 8px;
   }
 
   .admin-nav {
-    padding: 16px;
+    padding: 12px;
     flex-direction: row;
     overflow-x: auto;
+    gap: 6px;
+    scrollbar-width: thin;
+  }
+
+  .admin-nav::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .admin-nav::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+
+  .admin-nav::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+  }
+
+  .sidebar-footer {
+    display: none;
   }
 
   .admin-nav-btn {
     white-space: nowrap;
     flex-shrink: 0;
+    padding: 10px 14px;
+    font-size: 13px;
   }
 
   .nav-label {
-    display: none;
+    display: inline;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-content {
+    padding: 12px;
+  }
+
+  .sidebar-header {
+    padding: 12px;
+    text-align: center;
+  }
+
+  .sidebar-header h2 {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .admin-badge {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .admin-nav {
+    padding: 8px;
+    gap: 4px;
+  }
+
+  .admin-nav-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    gap: 6px;
   }
 
   .nav-icon {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .nav-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .nav-label {
+    font-size: 12px;
   }
 }

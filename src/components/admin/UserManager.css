@@ -68,11 +68,14 @@
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 24px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .users-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .users-table thead {
@@ -526,12 +529,128 @@
 }
 
 @media (max-width: 768px) {
+  .user-manager {
+    overflow-x: hidden;
+  }
+
+  .user-manager-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .user-manager-header h2 {
+    font-size: 22px;
+  }
+
   .user-filters {
     flex-direction: column;
   }
 
   .search-input {
     min-width: 100%;
+    width: 100%;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  /* Ukryj tabelę na mobile */
+  .users-table-container {
+    overflow: visible;
+    border: none;
+    background: transparent;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .users-table {
+    width: 100%;
+    max-width: 100%;
+    min-width: auto !important;
+  }
+
+  .users-table thead {
+    display: none;
+  }
+
+  .users-table,
+  .users-table tbody,
+  .users-table tr {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .users-table tbody tr {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .users-table tbody tr:hover {
+    background: var(--surface);
+  }
+
+  .users-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border: none;
+    text-align: right;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .users-table td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
+    flex: 1;
+  }
+
+  .users-table td > * {
+    flex: 1;
+    text-align: right;
+    max-width: 100%;
+  }
+
+  .user-email {
+    flex-direction: column;
+    align-items: flex-end !important;
+    gap: 4px;
+    max-width: 100%;
+    word-break: break-word;
+  }
+
+  .role-cell {
+    flex-direction: column;
+    align-items: flex-end !important;
+    gap: 8px;
+  }
+
+  .user-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .user-actions button {
+    width: 100%;
+    font-size: 13px;
+    padding: 8px 12px;
   }
 
   .modal-content {
@@ -546,5 +665,43 @@
   .btn-danger,
   .btn-primary {
     width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .user-manager {
+    padding: 0;
+  }
+
+  .user-manager-header h2 {
+    font-size: 20px;
+  }
+
+  .users-table tbody tr {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .users-table td {
+    padding: 6px 0;
+    font-size: 14px;
+  }
+
+  .users-table td:before {
+    font-size: 12px;
+  }
+
+  .role-badge,
+  .status-badge {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .btn-change-role,
+  .btn-ban,
+  .btn-unban {
+    font-size: 12px;
+    padding: 6px 10px;
+    white-space: normal;
   }
 }

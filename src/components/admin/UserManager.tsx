@@ -302,18 +302,18 @@ export const UserManager = () => {
               <tbody>
                 {currentItems.map((user) => (
                   <tr key={user.id} className={user.is_banned ? 'banned-row' : ''}>
-                    <td>
+                    <td data-label="Email">
                       <div className="user-email">
                         {user.email}
                         {user.username && <span className="username">@{user.username}</span>}
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Imię i nazwisko">
                       {user.first_name || user.last_name
                         ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
                         : '-'}
                     </td>
-                    <td>
+                    <td data-label="Rola">
                       <div className="role-cell">
                         <span className={`role-badge ${getRoleBadgeClass(user.role)}`}>
                           {getRoleLabel(user.role)}
@@ -329,19 +329,19 @@ export const UserManager = () => {
                         )}
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Status">
                       {user.is_banned ? (
                         <span className="status-badge status-banned">Zablokowany</span>
                       ) : (
                         <span className="status-badge status-active">Aktywny</span>
                       )}
                     </td>
-                    <td>
+                    <td data-label="Data utworzenia">
                       {user.created_at
                         ? new Date(user.created_at).toLocaleDateString('pl-PL')
                         : '-'}
                     </td>
-                    <td>
+                    <td data-label="Akcje">
                       <div className="user-actions">
                         {user.id === currentAdminId ? (
                           <span className="current-user-label">To Ty</span>

@@ -68,12 +68,25 @@ export const Shop = () => {
       // Load featured products (random 10)
       const { data: allProducts } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          product_images (
+            original_url,
+            thumbnail_url,
+            display_order
+          )
+        `)
         .limit(100);
 
       if (allProducts && allProducts.length > 0) {
+        // Map products with images
+        const mappedProducts = allProducts.map(product => ({
+          ...product,
+          image_url: product.product_images?.[0]?.thumbnail_url || product.product_images?.[0]?.original_url
+        }));
+
         // Get random products for featured slider
-        const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
+        const shuffled = [...mappedProducts].sort(() => 0.5 - Math.random());
         setFeaturedProducts(shuffled.slice(0, 10));
         setProducts(shuffled.slice(0, 20)); // Show first 20 products
       }
@@ -91,17 +104,43 @@ export const Shop = () => {
       // Load all products
       const { data } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          product_images (
+            original_url,
+            thumbnail_url,
+            display_order
+          )
+        `)
         .limit(20);
-      setProducts(data || []);
+      
+      const mappedProducts = data?.map(product => ({
+        ...product,
+        image_url: product.product_images?.[0]?.thumbnail_url || product.product_images?.[0]?.original_url
+      })) || [];
+      
+      setProducts(mappedProducts);
     } else {
       // Load products for selected category
       const { data } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          product_images (
+            original_url,
+            thumbnail_url,
+            display_order
+          )
+        `)
         .eq('category_id', categoryId)
         .limit(20);
-      setProducts(data || []);
+      
+      const mappedProducts = data?.map(product => ({
+        ...product,
+        image_url: product.product_images?.[0]?.thumbnail_url || product.product_images?.[0]?.original_url
+      })) || [];
+      
+      setProducts(mappedProducts);
     }
   };
 

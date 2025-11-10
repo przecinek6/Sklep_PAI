@@ -152,6 +152,19 @@
   z-index: 2;
 }
 
+.image-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(34, 197, 94, 0.9);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 2;
+}
+
 .image-preview-item img {
   width: 100%;
   height: 100%;
@@ -356,11 +369,72 @@
 }
 
 /* Responsive */
+/* Responsive */
+@media (max-width: 1200px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .product-manager {
+    padding: 20px;
+  }
+
+  .product-form {
+    padding: 20px;
+  }
+
+  .form-section {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+  }
+}
+
 @media (max-width: 768px) {
+  .product-manager {
+    padding: 16px;
+  }
+
   .product-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+  }
+
+  .product-header h2 {
+    font-size: 22px;
+  }
+
+  .product-form {
+    padding: 16px;
+  }
+
+  .form-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+  }
+
+  .form-section h3 {
+    font-size: 16px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-actions button {
+    width: 100%;
   }
 
   .products-grid {
@@ -373,6 +447,107 @@
 
   .images-preview {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  .editor-toolbar {
+    gap: 3px;
+    padding: 6px;
+  }
+
+  .editor-btn {
+    min-width: 28px;
+    height: 28px;
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .product-manager {
+    padding: 12px;
+  }
+
+  .product-header h2 {
+    font-size: 20px;
+  }
+
+  .product-form {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .form-section {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+  }
+
+  .form-section h3 {
+    font-size: 15px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+
+  .dropzone {
+    padding: 20px 15px;
+    font-size: 13px;
+  }
+
+  .images-preview {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+  }
+
+  .image-order {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+
+  .drag-handle {
+    font-size: 18px;
+    padding: 4px;
+  }
+
+  .editor-toolbar {
+    gap: 2px;
+    padding: 4px;
+  }
+
+  .editor-btn {
+    min-width: 26px;
+    height: 26px;
+    padding: 2px 4px;
+    font-size: 11px;
+  }
+
+  .html-textarea {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .product-card {
+    padding: 12px;
+  }
+
+  .product-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .product-actions button {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    font-size: 13px;
+    padding: 8px 12px;
   }
 }
 

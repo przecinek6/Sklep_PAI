@@ -7,6 +7,16 @@ interface ImageFile {
   file: File;
   preview: string;
   id: string;
+  type: 'new';
+}
+
+interface ExistingImage {
+  id: string;
+  original_url: string;
+  thumbnail_url?: string;
+  display_order: number;
+  type: 'existing';
+  product_id: string;
 }
 
 export const ProductManager = () => {
@@ -31,7 +41,7 @@ export const ProductManager = () => {
     is_featured: false,
   });
 
-  const [images, setImages] = useState<ImageFile[]>([]);
+  const [images, setImages] = useState<(ImageFile | ExistingImage)[]>([]);
   const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
@@ -134,6 +144,7 @@ export const ProductManager = () => {
           file,
           preview,
           id: Math.random().toString(36).substr(2, 9),
+          type: 'new',
         });
       }
     });
@@ -144,7 +155,7 @@ export const ProductManager = () => {
   const removeImage = (id: string) => {
     setImages(prev => {
       const image = prev.find(img => img.id === id);
-      if (image) {
+      if (image && image.type === 'new') {
         URL.revokeObjectURL(image.preview);
       }
       return prev.filter(img => img.id !== id);
@@ -257,35 +268,60 @@ export const ProductManager = () => {
     setUploadingImages(true);
     
     try {
+      // Najpierw usuń wszystkie istniejące zdjęcia z bazy (jeśli edytujemy)
+      if (editingProduct) {
+        const { error: deleteError } = await supabase
+          .from('product_images')
+          .delete()
+          .eq('product_id', productId);
+        
+        if (deleteError) throw deleteError;
+      }
+      
+      // Następnie zapisz wszystkie zdjęcia w nowej kolejności
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
-        const fileExt = image.file.name.split('.').pop();
-        const fileName = `${productId}_${Date.now()}_${i}.${fileExt}`;
-        const filePath = `products/${fileName}`;
+        
+        if (image.type === 'new') {
+          // Nowe zdjęcie - upload do storage
+          const fileExt = image.file.name.split('.').pop();
+          const fileName = `${productId}_${Date.now()}_${i}.${fileExt}`;
+          const filePath = `products/${fileName}`;
 
-        // Upload do Supabase Storage
-        const { error: uploadError } = await supabase.storage
-          .from('product-images')
-          .upload(filePath, image.file);
+          const { error: uploadError } = await supabase.storage
+            .from('product-images')
+            .upload(filePath, image.file);
 
-        if (uploadError) throw uploadError;
+          if (uploadError) throw uploadError;
 
-        // Pobierz publiczny URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(filePath);
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(filePath);
 
-        // Zapisz do bazy
-        const { error: dbError } = await supabase
-          .from('product_images')
-          .insert([{
-            product_id: productId,
-            original_url: publicUrl,
-            display_order: i,
-            alt_text: formData.name,
-          }]);
+          const { error: dbError } = await supabase
+            .from('product_images')
+            .insert([{
+              product_id: productId,
+              original_url: publicUrl,
+              display_order: i,
+              alt_text: formData.name,
+            }]);
 
-        if (dbError) throw dbError;
+          if (dbError) throw dbError;
+        } else {
+          // Istniejące zdjęcie - tylko aktualizuj display_order
+          const { error: updateError } = await supabase
+            .from('product_images')
+            .insert([{
+              product_id: productId,
+              original_url: image.original_url,
+              thumbnail_url: image.thumbnail_url,
+              display_order: i,
+              alt_text: formData.name,
+            }]);
+
+          if (updateError) throw updateError;
+        }
       }
     } catch (error) {
       console.error('Error uploading images:', error);
@@ -312,7 +348,7 @@ export const ProductManager = () => {
     }
   };
 
-  const startEdit = (product: Product) => {
+  const startEdit = async (product: Product) => {
     setEditingProduct(product);
     setFormData({
       name: product.name,
@@ -324,6 +360,32 @@ export const ProductManager = () => {
       is_active: product.is_active,
       is_featured: product.is_featured,
     });
+    
+    // Pobierz istniejące zdjęcia produktu
+    try {
+      const { data: existingImages, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', product.id)
+        .order('display_order');
+      
+      if (error) throw error;
+      
+      if (existingImages) {
+        const mappedImages: ExistingImage[] = existingImages.map(img => ({
+          id: img.id,
+          original_url: img.original_url,
+          thumbnail_url: img.thumbnail_url,
+          display_order: img.display_order,
+          type: 'existing',
+          product_id: img.product_id,
+        }));
+        setImages(mappedImages);
+      }
+    } catch (error) {
+      console.error('Error loading product images:', error);
+    }
+    
     setShowForm(true);
   };
 
@@ -590,7 +652,10 @@ export const ProductManager = () => {
                     onDragEnd={handleImageDragEnd}
                   >
                     <div className="drag-handle">⋮⋮</div>
-                    <img src={image.preview} alt="Preview" />
+                    <img 
+                      src={image.type === 'new' ? image.preview : (image.thumbnail_url || image.original_url)} 
+                      alt="Preview" 
+                    />
                     <button
                       type="button"
                       className="remove-image"
