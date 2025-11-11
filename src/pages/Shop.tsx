@@ -65,7 +65,40 @@ export const Shop = () => {
         setCategories(rootCategories);
       }
 
-      // Load featured products (random 10)
+      // Load featured products from active slider template
+      const { data: activeTemplate } = await supabase
+        .from('slider_templates')
+        .select('id')
+        .eq('is_active', true)
+        .single();
+
+      if (activeTemplate) {
+        const { data: sliderProducts } = await supabase
+          .from('slider_template_products')
+          .select(`
+            display_order,
+            product:products(
+              *,
+              product_images(
+                original_url,
+                thumbnail_url,
+                display_order
+              )
+            )
+          `)
+          .eq('template_id', activeTemplate.id)
+          .order('display_order', { ascending: true });
+
+        if (sliderProducts) {
+          const mappedFeatured = sliderProducts.map((sp: any) => ({
+            ...sp.product,
+            image_url: sp.product.product_images?.[0]?.thumbnail_url || sp.product.product_images?.[0]?.original_url
+          }));
+          setFeaturedProducts(mappedFeatured);
+        }
+      }
+
+      // Load all products for shop display
       const { data: allProducts } = await supabase
         .from('products')
         .select(`
@@ -76,6 +109,7 @@ export const Shop = () => {
             display_order
           )
         `)
+        .eq('is_active', true)
         .limit(100);
 
       if (allProducts && allProducts.length > 0) {
@@ -85,10 +119,7 @@ export const Shop = () => {
           image_url: product.product_images?.[0]?.thumbnail_url || product.product_images?.[0]?.original_url
         }));
 
-        // Get random products for featured slider
-        const shuffled = [...mappedProducts].sort(() => 0.5 - Math.random());
-        setFeaturedProducts(shuffled.slice(0, 10));
-        setProducts(shuffled.slice(0, 20)); // Show first 20 products
+        setProducts(mappedProducts.slice(0, 20)); // Show first 20 products
       }
     } catch (error) {
       console.error('Error loading data:', error);
