@@ -80,7 +80,9 @@ export const ThemeManager = () => {
         .eq('id', themeId);
 
       if (error) throw error;
-      loadThemes();
+      
+      // Odśwież stronę aby natychmiast zastosować nowy motyw
+      window.location.reload();
     } catch (error) {
       console.error('Error setting active theme:', error);
       alert('Błąd ustawiania aktywnego motywu');
@@ -210,27 +212,6 @@ export const ThemeManager = () => {
                   placeholder="#0f172a"
                 />
               </div>
-            </div>
-          </div>
-
-          <div className="theme-preview">
-            <p>Podgląd:</p>
-            <div className="preview-colors">
-              <div
-                className="preview-color"
-                style={{ background: formData.primary_color }}
-                title="Podstawowy"
-              />
-              <div
-                className="preview-color"
-                style={{ background: formData.secondary_color }}
-                title="Drugorzędny"
-              />
-              <div
-                className="preview-color"
-                style={{ background: formData.accent_color }}
-                title="Akcentujący"
-              />
             </div>
           </div>
 
