@@ -1,12 +1,12 @@
 /* Navbar Styles */
 
 .navbar {
-  background: var(--background);
-  border-bottom: 1px solid var(--border);
+  background: white;
+  border-bottom: 1px solid var(--color-3);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .navbar-container {
@@ -23,14 +23,15 @@
 .navbar-logo {
   font-size: 24px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--color-3);
   text-decoration: none;
   white-space: nowrap;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .navbar-logo:hover {
-  opacity: 0.8;
+  color: var(--color-1);
+  transform: scale(1.05);
 }
 
 /* Segment 2: Search */
@@ -274,6 +275,8 @@
 .user-info {
   flex: 1;
   min-width: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .user-info-name {
