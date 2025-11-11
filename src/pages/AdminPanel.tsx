@@ -5,9 +5,10 @@ import { ThemeManager } from '../components/admin/ThemeManager';
 import { CategoryManager } from '../components/admin/CategoryManager';
 import { ProductManager } from '../components/admin/ProductManager';
 import { UserManager } from '../components/admin/UserManager';
+import { SliderManager } from '../components/admin/SliderManager';
 import './AdminPanel.css';
 
-type AdminTab = 'themes' | 'categories' | 'products' | 'users';
+type AdminTab = 'themes' | 'categories' | 'products' | 'users' | 'slider';
 
 export const AdminPanel = () => {
   const { isAdmin, loading } = useAdminCheck();
@@ -94,6 +95,19 @@ export const AdminPanel = () => {
             <span className="nav-label">Użytkownicy</span>
           </button>
 
+          <button
+            className={`admin-nav-btn ${activeTab === 'slider' ? 'active' : ''}`}
+            onClick={() => setActiveTab('slider')}
+          >
+            <span className="nav-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="2" y="7" width="20" height="15" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <polyline points="17 2 12 7 7 2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+            <span className="nav-label">Slider</span>
+          </button>
+
           <div className="sidebar-footer">
             <button
               className="admin-nav-btn btn-home"
@@ -126,6 +140,10 @@ export const AdminPanel = () => {
 
         {activeTab === 'users' && (
           <UserManager />
+        )}
+
+        {activeTab === 'slider' && (
+          <SliderManager />
         )}
       </main>
     </div>
