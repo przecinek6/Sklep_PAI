@@ -30,44 +30,98 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Funkcja obliczająca dodatkowe kolory na podstawie głównego koloru
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 0, g: 0, b: 0 };
+  };
+
+  const rgbToHex = (r: number, g: number, b: number) => {
+    return "#" + [r, g, b].map(x => {
+      const hex = Math.round(x).toString(16);
+      return hex.length === 1 ? "0" + hex : hex;
+    }).join('');
+  };
+
   const generateColorVariants = (hexColor: string) => {
-    // Konwersja HEX na RGB
-    const hex = hexColor.replace('#', '');
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
+    const rgb = hexToRgb(hexColor);
 
-    // Hover (ciemniejszy o 10%)
-    const darken = (value: number) => Math.max(0, Math.floor(value * 0.9));
-    const hoverColor = `#${darken(r).toString(16).padStart(2, '0')}${darken(g).toString(16).padStart(2, '0')}${darken(b).toString(16).padStart(2, '0')}`;
+    // Hover (ciemniejszy o 15%)
+    const darkenHover = (value: number) => Math.max(0, Math.floor(value * 0.85));
+    const hover = rgbToHex(darkenHover(rgb.r), darkenHover(rgb.g), darkenHover(rgb.b));
 
-    // Light (jaśniejszy o 40%)
-    const lighten = (value: number) => Math.min(255, Math.floor(value + (255 - value) * 0.4));
-    const lightColor = `#${lighten(r).toString(16).padStart(2, '0')}${lighten(g).toString(16).padStart(2, '0')}${lighten(b).toString(16).padStart(2, '0')}`;
+    // Light (jaśniejszy o 80%)
+    const lighten = (value: number) => Math.min(255, Math.floor(value + (255 - value) * 0.8));
+    const light = rgbToHex(lighten(rgb.r), lighten(rgb.g), lighten(rgb.b));
 
-    return { hover: hoverColor, light: lightColor };
+    // Lighter (jaśniejszy o 95%)
+    const lightenMore = (value: number) => Math.min(255, Math.floor(value + (255 - value) * 0.95));
+    const lighter = rgbToHex(lightenMore(rgb.r), lightenMore(rgb.g), lightenMore(rgb.b));
+
+    // Dark (ciemniejszy o 30%)
+    const darken = (value: number) => Math.max(0, Math.floor(value * 0.7));
+    const dark = rgbToHex(darken(rgb.r), darken(rgb.g), darken(rgb.b));
+
+    return { hover, light, lighter, dark };
   };
 
   // Zastosuj motyw do CSS variables
   const applyTheme = (theme: Theme) => {
     const root = document.documentElement;
 
-    // Główne kolory
+    // Główne 3 kolory
     root.style.setProperty('--primary-color', theme.primary_color);
     root.style.setProperty('--secondary-color', theme.secondary_color);
     root.style.setProperty('--accent-color', theme.accent_color);
 
-    // Wygeneruj warianty
+    // Wygeneruj warianty dla PRIMARY
     const primaryVariants = generateColorVariants(theme.primary_color);
-    const secondaryVariants = generateColorVariants(theme.secondary_color);
-    const accentVariants = generateColorVariants(theme.accent_color);
-
     root.style.setProperty('--primary-hover', primaryVariants.hover);
     root.style.setProperty('--primary-light', primaryVariants.light);
+    root.style.setProperty('--primary-lighter', primaryVariants.lighter);
+    root.style.setProperty('--primary-dark', primaryVariants.dark);
+
+    // Wygeneruj warianty dla SECONDARY
+    const secondaryVariants = generateColorVariants(theme.secondary_color);
     root.style.setProperty('--secondary-hover', secondaryVariants.hover);
     root.style.setProperty('--secondary-light', secondaryVariants.light);
+    root.style.setProperty('--secondary-lighter', secondaryVariants.lighter);
+    root.style.setProperty('--secondary-dark', secondaryVariants.dark);
+
+    // Wygeneruj warianty dla ACCENT
+    const accentVariants = generateColorVariants(theme.accent_color);
     root.style.setProperty('--accent-hover', accentVariants.hover);
     root.style.setProperty('--accent-light', accentVariants.light);
+    root.style.setProperty('--accent-lighter', accentVariants.lighter);
+    root.style.setProperty('--accent-dark', accentVariants.dark);
+
+    // Kolory systemowe oparte na trzech głównych
+    const primaryRgb = hexToRgb(theme.primary_color);
+    const accentRgb = hexToRgb(theme.accent_color);
+
+    // Background i Surface oparte na ACCENT (zwykle najciemniejszy)
+    root.style.setProperty('--background', accentVariants.lighter);
+    root.style.setProperty('--surface', accentVariants.light);
+    root.style.setProperty('--border', `rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0.15)`);
+
+    // Teksty oparte na ACCENT
+    root.style.setProperty('--text-primary', accentVariants.dark);
+    root.style.setProperty('--text-secondary', `rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0.7)`);
+    root.style.setProperty('--text-tertiary', `rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0.5)`);
+
+    // Success, warning, error oparte na PRIMARY i SECONDARY
+    root.style.setProperty('--success', '#10b981');
+    root.style.setProperty('--warning', '#f59e0b');
+    root.style.setProperty('--error', '#ef4444');
+    root.style.setProperty('--info', theme.primary_color);
+
+    // Shadow oparte na PRIMARY
+    root.style.setProperty('--shadow-sm', `0 1px 2px 0 rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.05)`);
+    root.style.setProperty('--shadow-md', `0 4px 6px -1px rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.1)`);
+    root.style.setProperty('--shadow-lg', `0 10px 15px -3px rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.1)`);
 
     setCurrentTheme(theme);
   };
