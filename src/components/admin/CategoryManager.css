@@ -36,7 +36,7 @@
 /* Layout - Two columns */
 .category-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 24px;
 }
 
@@ -499,22 +499,6 @@
 /* Responsive */
 @media (max-width: 1200px) {
   .category-layout {
-    gap: 20px;
-  }
-
-  .category-left,
-  .category-right {
-    padding: 20px;
-  }
-
-  .tree-node {
-    min-height: 45px;
-    padding: 12px 10px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .category-layout {
     grid-template-columns: 1fr;
     gap: 20px;
   }
@@ -604,6 +588,9 @@
 
   .categories-tree-view {
     max-height: 400px;
+  }
+  .btn{
+    width: 100%;
   }
 }
 
