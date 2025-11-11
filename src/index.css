@@ -13,14 +13,55 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+
+  /* Domyślne wartości CSS (będą nadpisane przez ThemeContext) */
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-light: #dbeafe;
+  --primary-lighter: #eff6ff;
+  --primary-dark: #1e40af;
+
+  --secondary-color: #64748b;
+  --secondary-hover: #475569;
+  --secondary-light: #e2e8f0;
+  --secondary-lighter: #f1f5f9;
+  --secondary-dark: #334155;
+
+  --accent-color: #0f172a;
+  --accent-hover: #020617;
+  --accent-light: #cbd5e1;
+  --accent-lighter: #f8fafc;
+  --accent-dark: #000000;
+
+  --background: #ffffff;
+  --surface: #f8fafc;
+  --border: rgba(15, 23, 42, 0.15);
+
+  --text-primary: #0f172a;
+  --text-secondary: rgba(15, 23, 42, 0.7);
+  --text-tertiary: rgba(15, 23, 42, 0.5);
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #ffffff;
-  color: #1a202c;
+  background: var(--background);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {
