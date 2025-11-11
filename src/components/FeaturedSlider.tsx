@@ -79,8 +79,7 @@ export const FeaturedSlider = ({ products }: FeaturedSliderProps) => {
             <div
               className="slider-content"
               style={{
-                transform: `translateX(-${currentIndex * (100 / visibleCount)}%)`,
-                gridTemplateColumns: `repeat(${products.length}, ${100 / visibleCount}%)`,
+                transform: `translateX(calc(-${currentIndex} * ((100% - ${(visibleCount - 1) * 16}px) / ${visibleCount} + 16px)))`,
               }}
             >
               {products.map((product) => (
