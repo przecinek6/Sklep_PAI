@@ -85,6 +85,22 @@ export interface UserPreferences {
   updated_at?: string;
 }
 
+export interface SliderTemplate {
+  id: string;
+  name: string;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SliderTemplateProduct {
+  id: string;
+  template_id: string;
+  product_id: string;
+  display_order: number;
+  created_at?: string;
+}
+
 export interface AuthResponse {
   user: UserProfile | null;
   error: Error | null;
