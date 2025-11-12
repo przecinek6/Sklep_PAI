@@ -6,6 +6,7 @@ import { Home } from './pages/Home';
 import { AdminPanel } from './pages/AdminPanel';
 import { Shop } from './pages/Shop';
 import { ProductPage } from './pages/ProductPage';
+import { SearchPage } from './pages/SearchPage';
 import './App.css';
 
 function App() {
@@ -70,7 +71,7 @@ function App() {
           />
           <Route
             path="/search"
-            element={<div>Wyszukiwanie - w budowie</div>}
+            element={<SearchPage />}
           />
         </Routes>
       </Router>
