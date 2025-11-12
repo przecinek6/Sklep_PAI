@@ -41,7 +41,6 @@ export interface Category {
   slug: string;
   description?: string;
   parent_id?: string;
-  icon?: string;
   display_order: number;
   is_active: boolean;
   created_at?: string;
@@ -53,14 +52,10 @@ export interface Product {
   name: string;
   slug: string;
   description?: string;
-  short_description?: string;
   price: number;
-  compare_at_price?: number;
   stock_quantity: number;
-  sku?: string;
   category_id?: string;
   is_active: boolean;
-  is_featured: boolean;
   created_by?: string;
   created_at?: string;
   updated_at?: string;
@@ -74,7 +69,6 @@ export interface ProductImage {
   medium_url?: string;
   large_url?: string;
   display_order: number;
-  alt_text?: string;
   created_at?: string;
 }
 
