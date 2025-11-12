@@ -1,19 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './FeaturedSlider.css';
 
 interface Product {
   id: string;
   name: string;
+  slug: string;
   price: number;
   image_url?: string;
 }
 
 interface FeaturedSliderProps {
   products: Product[];
+  sliderName?: string;
 }
 
-export const FeaturedSlider = ({ products }: FeaturedSliderProps) => {
+export const FeaturedSlider = ({ products, sliderName = 'Wyróżnione produkty' }: FeaturedSliderProps) => {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(5);
 
@@ -53,7 +57,7 @@ export const FeaturedSlider = ({ products }: FeaturedSliderProps) => {
     return (
       <section className="featured-slider">
         <div className="featured-container">
-          <h2 className="featured-title">Wyróżnione produkty</h2>
+          <h2 className="featured-title">{sliderName}</h2>
           <p className="featured-empty">Brak wyróżnionych produktów</p>
         </div>
       </section>
@@ -63,7 +67,7 @@ export const FeaturedSlider = ({ products }: FeaturedSliderProps) => {
   return (
     <section className="featured-slider">
       <div className="featured-container">
-        <h2 className="featured-title">Wyróżnione produkty</h2>
+        <h2 className="featured-title">{sliderName}</h2>
         
         <div className="slider-wrapper">
           <button
@@ -83,7 +87,12 @@ export const FeaturedSlider = ({ products }: FeaturedSliderProps) => {
               }}
             >
               {products.map((product) => (
-                <div key={product.id} className="product-card">
+                <div 
+                  key={product.id} 
+                  className="product-card"
+                  onClick={() => navigate(`/product/${product.slug}`)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="product-image">
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.name} />
