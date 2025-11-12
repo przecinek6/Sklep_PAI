@@ -5,6 +5,7 @@ import { Login } from './pages/Login';
 import { Home } from './pages/Home';
 import { AdminPanel } from './pages/AdminPanel';
 import { Shop } from './pages/Shop';
+import { ProductPage } from './pages/ProductPage';
 import './App.css';
 
 function App() {
@@ -38,6 +39,10 @@ function App() {
           <Route
             path="/"
             element={<Shop />}
+          />
+          <Route
+            path="/product/:slug"
+            element={<ProductPage />}
           />
           <Route
             path="/profile"
