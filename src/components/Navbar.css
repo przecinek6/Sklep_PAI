@@ -39,6 +39,7 @@
   width: 100%;
   max-width: 600px;
   justify-self: center;
+  position: relative;
 }
 
 .search-wrapper {
@@ -53,11 +54,12 @@
   transform: translateY(-50%);
   color: var(--text-secondary);
   pointer-events: none;
+  z-index: 2;
 }
 
 .search-input {
   width: 100%;
-  padding: 12px 16px 12px 48px;
+  padding: 12px 48px 12px 48px;
   border: 1px solid var(--border);
   border-radius: 24px;
   font-size: 14px;
@@ -74,6 +76,169 @@
 
 .search-input::placeholder {
   color: var(--text-secondary);
+}
+
+.search-clear {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.search-clear:hover {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+/* Search Suggestions */
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.suggestions-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.suggestions-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.suggestions-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.suggestion-item:last-of-type {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: var(--surface);
+}
+
+.suggestion-image {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.suggestion-image-placeholder {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.suggestion-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.suggestion-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggestion-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.suggestion-see-all {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: none;
+  border-top: 1px solid var(--border);
+  color: var(--primary-color);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.suggestion-see-all:hover {
+  background: var(--primary-light);
 }
 
 /* Segment 3: Actions */
@@ -177,6 +342,20 @@
     padding: 8px 16px;
     font-size: 13px;
   }
+
+  .search-suggestions {
+    max-height: 300px;
+  }
+
+  .suggestion-item {
+    padding: 10px 12px;
+  }
+
+  .suggestion-image,
+  .suggestion-image-placeholder {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -189,7 +368,7 @@
   }
 
   .search-input {
-    padding: 10px 12px 10px 40px;
+    padding: 10px 40px 10px 40px;
     font-size: 13px;
   }
 
@@ -197,8 +376,40 @@
     left: 12px;
   }
 
+  .search-clear {
+    right: 12px;
+  }
+
   .btn-login {
     padding: 8px 12px;
+  }
+
+  .search-suggestions {
+    max-height: 250px;
+  }
+
+  .suggestion-item {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .suggestion-image,
+  .suggestion-image-placeholder {
+    width: 36px;
+    height: 36px;
+  }
+
+  .suggestion-name {
+    font-size: 13px;
+  }
+
+  .suggestion-price {
+    font-size: 13px;
+  }
+
+  .suggestion-see-all {
+    font-size: 13px;
+    padding: 10px 12px;
   }
 }
 
