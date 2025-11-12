@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
 import { FeaturedSlider } from '../components/FeaturedSlider';
+import { Pagination } from '../components/Pagination';
 import './Shop.css';
 
 interface Category {
@@ -15,6 +17,7 @@ interface Category {
 interface Product {
   id: string;
   name: string;
+  slug: string;
   description: string;
   price: number;
   image_url?: string;
@@ -22,11 +25,41 @@ interface Product {
 }
 
 export const Shop = () => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [sliderName, setSliderName] = useState<string>('Wyróżnione produkty');
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const productsPerPage = 12;
+
+  // Funkcja pomocnicza do znalezienia kategorii rekurencyjnie
+  const findCategoryById = (categoryId: string, categoryList: Category[]): Category | null => {
+    for (const category of categoryList) {
+      if (category.id === categoryId) {
+        return category;
+      }
+      if (category.children) {
+        const found = findCategoryById(categoryId, category.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  // Funkcja rekurencyjnie zbierająca wszystkie ID kategorii i jej podkategorii
+  const getAllCategoryIds = (category: Category): string[] => {
+    const ids = [category.id];
+    if (category.children && category.children.length > 0) {
+      category.children.forEach(child => {
+        ids.push(...getAllCategoryIds(child));
+      });
+    }
+    return ids;
+  };
 
   useEffect(() => {
     loadData();
@@ -68,11 +101,13 @@ export const Shop = () => {
       // Load featured products from active slider template
       const { data: activeTemplate } = await supabase
         .from('slider_templates')
-        .select('id')
+        .select('id, name')
         .eq('is_active', true)
         .single();
 
       if (activeTemplate) {
+        setSliderName(activeTemplate.name);
+        
         const { data: sliderProducts } = await supabase
           .from('slider_template_products')
           .select(`
@@ -99,7 +134,7 @@ export const Shop = () => {
       }
 
       // Load all products for shop display
-      const { data: allProducts } = await supabase
+      const { data: allProducts, count } = await supabase
         .from('products')
         .select(`
           *,
@@ -108,9 +143,13 @@ export const Shop = () => {
             thumbnail_url,
             display_order
           )
-        `)
+        `, { count: 'exact' })
         .eq('is_active', true)
-        .limit(100);
+        .range(0, productsPerPage - 1);
+
+      if (count !== null) {
+        setTotalProducts(count);
+      }
 
       if (allProducts && allProducts.length > 0) {
         // Map products with images
@@ -119,7 +158,7 @@ export const Shop = () => {
           image_url: product.product_images?.[0]?.thumbnail_url || product.product_images?.[0]?.original_url
         }));
 
-        setProducts(mappedProducts.slice(0, 20)); // Show first 20 products
+        setProducts(mappedProducts);
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -130,8 +169,75 @@ export const Shop = () => {
 
   const handleCategoryClick = async (categoryId: string | null) => {
     setSelectedCategory(categoryId);
+    setCurrentPage(1); // Reset to first page when changing category
     
     if (!categoryId) {
+      // Load all products
+      const { data, count } = await supabase
+        .from('products')
+        .select(`
+          *,
+          product_images (
+            original_url,
+            thumbnail_url,
+            display_order
+          )
+        `, { count: 'exact' })
+        .eq('is_active', true)
+        .range(0, productsPerPage - 1);
+      
+      if (count !== null) {
+        setTotalProducts(count);
+      }
+      
+      const mappedProducts = data?.map(product => ({
+        ...product,
+        image_url: product.product_images?.[0]?.thumbnail_url || product.product_images?.[0]?.original_url
+      })) || [];
+      
+      setProducts(mappedProducts);
+    } else {
+      // Znajdź wybraną kategorię
+      const selectedCategoryData = findCategoryById(categoryId, categories);
+      
+      if (selectedCategoryData) {
+        // Zbierz ID wybranej kategorii i wszystkich jej podkategorii
+        const categoryIds = getAllCategoryIds(selectedCategoryData);
+        
+        // Load products for selected category and all its subcategories
+        const { data, count } = await supabase
+          .from('products')
+          .select(`
+            *,
+            product_images (
+              original_url,
+              thumbnail_url,
+              display_order
+            )
+          `, { count: 'exact' })
+          .in('category_id', categoryIds)
+          .eq('is_active', true)
+          .range(0, productsPerPage - 1);
+        
+        if (count !== null) {
+          setTotalProducts(count);
+        }
+        
+        const mappedProducts = data?.map(product => ({
+          ...product,
+          image_url: product.product_images?.[0]?.thumbnail_url || product.product_images?.[0]?.original_url
+        })) || [];
+        
+        setProducts(mappedProducts);
+      }
+    }
+  };
+
+  const loadPage = async (page: number) => {
+    const from = (page - 1) * productsPerPage;
+    const to = from + productsPerPage - 1;
+
+    if (!selectedCategory) {
       // Load all products
       const { data } = await supabase
         .from('products')
@@ -143,7 +249,8 @@ export const Shop = () => {
             display_order
           )
         `)
-        .limit(20);
+        .eq('is_active', true)
+        .range(from, to);
       
       const mappedProducts = data?.map(product => ({
         ...product,
@@ -152,27 +259,38 @@ export const Shop = () => {
       
       setProducts(mappedProducts);
     } else {
-      // Load products for selected category
-      const { data } = await supabase
-        .from('products')
-        .select(`
-          *,
-          product_images (
-            original_url,
-            thumbnail_url,
-            display_order
-          )
-        `)
-        .eq('category_id', categoryId)
-        .limit(20);
+      // Znajdź wybraną kategorię
+      const selectedCategoryData = findCategoryById(selectedCategory, categories);
       
-      const mappedProducts = data?.map(product => ({
-        ...product,
-        image_url: product.product_images?.[0]?.thumbnail_url || product.product_images?.[0]?.original_url
-      })) || [];
-      
-      setProducts(mappedProducts);
+      if (selectedCategoryData) {
+        // Zbierz ID wybranej kategorii i wszystkich jej podkategorii
+        const categoryIds = getAllCategoryIds(selectedCategoryData);
+        
+        // Load products for selected category and all its subcategories
+        const { data } = await supabase
+          .from('products')
+          .select(`
+            *,
+            product_images (
+              original_url,
+              thumbnail_url,
+              display_order
+            )
+          `)
+          .in('category_id', categoryIds)
+          .eq('is_active', true)
+          .range(from, to);
+        
+        const mappedProducts = data?.map(product => ({
+          ...product,
+          image_url: product.product_images?.[0]?.thumbnail_url || product.product_images?.[0]?.original_url
+        })) || [];
+        
+        setProducts(mappedProducts);
+      }
     }
+    
+    setCurrentPage(page);
   };
 
   const renderCategory = (category: Category, level: number = 0) => (
@@ -208,7 +326,7 @@ export const Shop = () => {
     <div className="shop-page">
       <Navbar />
       
-      <FeaturedSlider products={featuredProducts} />
+      <FeaturedSlider products={featuredProducts} sliderName={sliderName} />
 
       <main className="shop-main">
         <div className="shop-container">
@@ -216,6 +334,18 @@ export const Shop = () => {
           <aside className="shop-sidebar">
             <h2 className="sidebar-title">Kategorie</h2>
             <div className="categories-list">
+              <button
+                className={`category-btn ${selectedCategory === null ? 'active' : ''}`}
+                onClick={() => handleCategoryClick(null)}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="7" height="7" strokeLinecap="round" strokeLinejoin="round"/>
+                  <rect x="14" y="3" width="7" height="7" strokeLinecap="round" strokeLinejoin="round"/>
+                  <rect x="14" y="14" width="7" height="7" strokeLinecap="round" strokeLinejoin="round"/>
+                  <rect x="3" y="14" width="7" height="7" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Wszystkie produkty
+              </button>
               {categories.map((category) => renderCategory(category))}
             </div>
           </aside>
@@ -224,8 +354,8 @@ export const Shop = () => {
           <section className="shop-content">
             <h2 className="content-title">
               {selectedCategory 
-                ? categories.find(c => c.id === selectedCategory)?.name || 'Produkty'
-                : 'Produkty'
+                ? findCategoryById(selectedCategory, categories)?.name || 'Produkty'
+                : 'Wszystkie produkty'
               }
             </h2>
 
@@ -236,7 +366,12 @@ export const Shop = () => {
             ) : (
               <div className="products-grid">
                 {products.map((product) => (
-                  <div key={product.id} className="product-card-shop">
+                  <div 
+                    key={product.id} 
+                    className="product-card-shop"
+                    onClick={() => navigate(`/product/${product.slug}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <div className="product-image-shop">
                       {product.image_url ? (
                         <img src={product.image_url} alt={product.name} />
@@ -251,12 +386,32 @@ export const Shop = () => {
                       <p className="product-description">{product.description}</p>
                       <div className="product-footer">
                         <span className="product-price-shop">{product.price.toFixed(2)} zł</span>
-                        <button className="btn-add-to-cart">Dodaj do koszyka</button>
+                        <button 
+                          className="btn-add-to-cart"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: Add to cart functionality
+                            alert('Dodano do koszyka');
+                          }}
+                        >
+                          Dodaj do koszyka
+                        </button>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
+            )}
+
+            {/* Pagination */}
+            {totalProducts > productsPerPage && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(totalProducts / productsPerPage)}
+                onPageChange={loadPage}
+                itemsPerPage={productsPerPage}
+                totalItems={totalProducts}
+              />
             )}
           </section>
         </div>
