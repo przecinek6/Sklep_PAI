@@ -38,7 +38,6 @@ export const ProductManager = () => {
     stock_quantity: 0,
     category_id: null as string | null,
     is_active: true,
-    is_featured: false,
   });
 
   const [images, setImages] = useState<(ImageFile | ExistingImage)[]>([]);
@@ -224,7 +223,6 @@ export const ProductManager = () => {
             stock_quantity: formData.stock_quantity,
             category_id: formData.category_id,
             is_active: formData.is_active,
-            is_featured: formData.is_featured,
           })
           .eq('id', editingProduct.id);
 
@@ -242,7 +240,6 @@ export const ProductManager = () => {
             stock_quantity: formData.stock_quantity,
             category_id: formData.category_id,
             is_active: formData.is_active,
-            is_featured: formData.is_featured,
           }])
           .select()
           .single();
@@ -304,7 +301,6 @@ export const ProductManager = () => {
               product_id: productId,
               original_url: publicUrl,
               display_order: i,
-              alt_text: formData.name,
             }]);
 
           if (dbError) throw dbError;
@@ -317,7 +313,6 @@ export const ProductManager = () => {
               original_url: image.original_url,
               thumbnail_url: image.thumbnail_url,
               display_order: i,
-              alt_text: formData.name,
             }]);
 
           if (updateError) throw updateError;
@@ -358,7 +353,6 @@ export const ProductManager = () => {
       stock_quantity: product.stock_quantity,
       category_id: product.category_id || null,
       is_active: product.is_active,
-      is_featured: product.is_featured,
     });
     
     // Pobierz istniejące zdjęcia produktu
@@ -399,7 +393,6 @@ export const ProductManager = () => {
       stock_quantity: 0,
       category_id: null,
       is_active: true,
-      is_featured: false,
     });
     setImages([]);
     setShowForm(false);
@@ -584,7 +577,7 @@ export const ProductManager = () => {
                   <option value="">Brak kategorii</option>
                   {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>
-                      {cat.icon} {cat.name}
+                      {cat.name}
                     </option>
                   ))}
                 </select>
@@ -690,23 +683,16 @@ export const ProductManager = () => {
               <div key={product.id} className="product-card">
                 <div className="product-header-card">
                   <h3>{product.name}</h3>
-                  {product.is_featured && <span className="featured-badge">Wyróżniony</span>}
                   {!product.is_active && <span className="inactive-badge">Nieaktywny</span>}
                 </div>
                 
                 <div className="product-details-card">
                   <div className="product-price">
                     {formatPrice(product.price)}
-                    {product.compare_at_price && product.compare_at_price > product.price && (
-                      <span className="old-price">{formatPrice(product.compare_at_price)}</span>
-                    )}
                   </div>
                   <div className="product-stock">
                     Stan: <strong>{product.stock_quantity}</strong> szt.
                   </div>
-                  {product.sku && (
-                    <div className="product-sku">SKU: {product.sku}</div>
-                  )}
                 </div>
 
                 <div className="product-actions-card">
