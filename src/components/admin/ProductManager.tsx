@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { Product, Category } from '../../types/database.types';
+import { generateImageVariants, getFileExtension } from '../../utils/imageOptimizer';
 import './ProductManager.css';
 
 interface ImageFile {
@@ -280,26 +281,81 @@ export const ProductManager = () => {
         const image = images[i];
         
         if (image.type === 'new') {
-          // Nowe zdjęcie - upload do storage
-          const fileExt = image.file.name.split('.').pop();
-          const fileName = `${productId}_${Date.now()}_${i}.${fileExt}`;
-          const filePath = `products/${fileName}`;
+          // Nowe zdjęcie - wygeneruj wszystkie warianty rozmiarów
+          const variants = await generateImageVariants(image.file);
+          const fileExt = getFileExtension(image.file.type);
+          const baseFileName = `${productId}_${Date.now()}_${i}`;
 
-          const { error: uploadError } = await supabase.storage
+          // Upload wszystkich wariantów do storage
+          const urls: {
+            original_url: string;
+            large_url: string;
+            medium_url: string;
+            thumbnail_url: string;
+          } = {
+            original_url: '',
+            large_url: '',
+            medium_url: '',
+            thumbnail_url: '',
+          };
+
+          // Upload original
+          const originalPath = `products/${baseFileName}_original.${fileExt}`;
+          const { error: uploadOriginalError } = await supabase.storage
             .from('product-images')
-            .upload(filePath, image.file);
+            .upload(originalPath, variants.original);
+          if (uploadOriginalError) throw uploadOriginalError;
 
-          if (uploadError) throw uploadError;
-
-          const { data: { publicUrl } } = supabase.storage
+          const { data: { publicUrl: originalUrl } } = supabase.storage
             .from('product-images')
-            .getPublicUrl(filePath);
+            .getPublicUrl(originalPath);
+          urls.original_url = originalUrl;
 
+          // Upload large
+          const largePath = `products/${baseFileName}_large.${fileExt}`;
+          const { error: uploadLargeError } = await supabase.storage
+            .from('product-images')
+            .upload(largePath, variants.large);
+          if (uploadLargeError) throw uploadLargeError;
+
+          const { data: { publicUrl: largeUrl } } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(largePath);
+          urls.large_url = largeUrl;
+
+          // Upload medium
+          const mediumPath = `products/${baseFileName}_medium.${fileExt}`;
+          const { error: uploadMediumError } = await supabase.storage
+            .from('product-images')
+            .upload(mediumPath, variants.medium);
+          if (uploadMediumError) throw uploadMediumError;
+
+          const { data: { publicUrl: mediumUrl } } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(mediumPath);
+          urls.medium_url = mediumUrl;
+
+          // Upload thumbnail
+          const thumbnailPath = `products/${baseFileName}_thumbnail.${fileExt}`;
+          const { error: uploadThumbnailError } = await supabase.storage
+            .from('product-images')
+            .upload(thumbnailPath, variants.thumbnail);
+          if (uploadThumbnailError) throw uploadThumbnailError;
+
+          const { data: { publicUrl: thumbnailUrl } } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(thumbnailPath);
+          urls.thumbnail_url = thumbnailUrl;
+
+          // Zapisz wszystkie URL-e do bazy danych
           const { error: dbError } = await supabase
             .from('product_images')
             .insert([{
               product_id: productId,
-              original_url: publicUrl,
+              original_url: urls.original_url,
+              large_url: urls.large_url,
+              medium_url: urls.medium_url,
+              thumbnail_url: urls.thumbnail_url,
               display_order: i,
             }]);
 
