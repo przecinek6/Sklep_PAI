@@ -116,6 +116,7 @@ export const Shop = () => {
               *,
               product_images(
                 original_url,
+                medium_url,
                 thumbnail_url,
                 display_order
               )
@@ -127,7 +128,7 @@ export const Shop = () => {
         if (sliderProducts) {
           const mappedFeatured = sliderProducts.map((sp: any) => ({
             ...sp.product,
-            image_url: sp.product.product_images?.[0]?.thumbnail_url || sp.product.product_images?.[0]?.original_url
+            image_url: sp.product.product_images?.[0]?.medium_url || sp.product.product_images?.[0]?.thumbnail_url || sp.product.product_images?.[0]?.original_url
           }));
           setFeaturedProducts(mappedFeatured);
         }
