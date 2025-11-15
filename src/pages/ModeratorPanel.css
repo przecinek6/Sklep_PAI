@@ -1,0 +1,88 @@
+.moderator-panel-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.moderator-panel-header {
+  margin-bottom: 2rem;
+}
+
+.moderator-panel-header h1 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.moderator-panel-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.moderator-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.moderator-tabs button {
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.moderator-tabs button:hover {
+  color: var(--primary-color);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.moderator-tabs button.active {
+  color: var(--primary-color);
+}
+
+.moderator-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-color);
+}
+
+.moderator-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .moderator-panel-container {
+    padding: 1rem;
+  }
+
+  .moderator-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .moderator-tabs button {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+}
