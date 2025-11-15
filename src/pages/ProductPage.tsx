@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
-import type { Product, ProductImage } from '../types/database.types';
+import { ProductReviews } from '../components/ProductReviews';
+import { ProductQuestions } from '../components/ProductQuestions';
+import { ProductReportModal } from '../components/ProductReportModal';
+import { Flag } from 'lucide-react';
+import type { Product, ProductImage, UserProfile } from '../types/database.types';
 import './ProductPage.css';
 
 interface ProductWithImages extends Product {
@@ -22,6 +26,36 @@ export const ProductPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    loadCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    if (slug) {
+      loadProduct();
+    }
+  }, [slug]);
+
+  const loadCurrentUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        setCurrentUser(profile);
+      }
+    } catch (error) {
+      console.error('Error loading user:', error);
+    }
+  };
 
   useEffect(() => {
     if (slug) {
@@ -280,6 +314,18 @@ export const ProductPage = () => {
                 Dodaj do koszyka
               </button>
             </div>
+
+            {/* Report Product Button */}
+            {currentUser && (
+              <button
+                className="btn-report-product"
+                onClick={() => setShowReportModal(true)}
+                title="Zgłoś problem z produktem"
+              >
+                <Flag size={18} />
+                Zgłoś problem
+              </button>
+            )}
           </div>
         </div>
 
@@ -293,7 +339,29 @@ export const ProductPage = () => {
             />
           </div>
         )}
+
+        {/* Reviews & Questions */}
+        <ProductReviews 
+          productId={product.id}
+          currentUserId={currentUser?.id}
+        />
+
+        <ProductQuestions 
+          productId={product.id}
+          currentUserId={currentUser?.id}
+          userRole={currentUser?.role}
+        />
       </div>
+
+      {/* Report Modal */}
+      {showReportModal && currentUser && (
+        <ProductReportModal
+          productId={product.id}
+          productName={product.name}
+          currentUserId={currentUser.id}
+          onClose={() => setShowReportModal(false)}
+        />
+      )}
 
       {/* Lightbox */}
       {lightboxOpen && sortedImages.length > 0 && (
