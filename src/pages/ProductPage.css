@@ -390,6 +390,36 @@
   cursor: not-allowed;
 }
 
+/* Report Product Button */
+.btn-report-product {
+  width: 100%;
+  padding: 12px 24px;
+  background: white;
+  color: var(--error);
+  border: 2px solid var(--error);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn-report-product:hover {
+  background: var(--error);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+}
+
+.btn-report-product:active {
+  transform: translateY(0);
+}
+
 /* Product Description Section */
 .product-description-section {
   background: white;
