@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { Login } from './pages/Login';
 import { AdminPanel } from './pages/AdminPanel';
+import ModeratorPanel from './pages/ModeratorPanel';
 import { MyAccount } from './pages/MyAccount';
 import { Shop } from './pages/Shop';
 import { ProductPage } from './pages/ProductPage';
@@ -59,7 +60,7 @@ function App() {
           />
           <Route
             path="/moderator"
-            element={user ? <div>Panel moderatora - w budowie</div> : <Navigate to="/login" replace />}
+            element={user ? <ModeratorPanel /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/admin"
