@@ -54,8 +54,8 @@ export const Login = () => {
       } else {
         // Sign up
         const { error } = await supabase.auth.signUp({
-          email: email,
-          password: password,
+          email,
+          password,
         });
         if (error) throw error;
         setError('Sprawdź swój email, aby potwierdzić konto');
