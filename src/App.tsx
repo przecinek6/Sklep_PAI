@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { Login } from './pages/Login';
-import { Home } from './pages/Home';
 import { AdminPanel } from './pages/AdminPanel';
+import { MyAccount } from './pages/MyAccount';
 import { Shop } from './pages/Shop';
 import { ProductPage } from './pages/ProductPage';
 import { SearchPage } from './pages/SearchPage';
@@ -47,7 +47,7 @@ function App() {
           />
           <Route
             path="/profile"
-            element={user ? <Home /> : <Navigate to="/login" replace />}
+            element={user ? <MyAccount /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/orders"
