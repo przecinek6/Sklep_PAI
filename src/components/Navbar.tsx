@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Search, User, ChevronDown, LogOut, Settings, ShieldCheck, UserCircle, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
+import CartIcon from './CartIcon';
 import './Navbar.css';
 
 interface SearchSuggestion {
@@ -330,20 +331,14 @@ export const Navbar = () => {
               </div>
 
               {/* Cart Button */}
-              <Link to="/cart" className="btn-cart">
-                <ShoppingCart size={24} />
-                <span className="cart-badge">0</span>
-              </Link>
+              <CartIcon />
             </>
           ) : (
             <>
               <Link to="/login" className="btn-login">
                 Zaloguj się
               </Link>
-              <Link to="/cart" className="btn-cart">
-                <ShoppingCart size={24} />
-                <span className="cart-badge">0</span>
-              </Link>
+              <CartIcon />
             </>
           )}
         </div>

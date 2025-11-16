@@ -5,6 +5,7 @@ import { Navbar } from '../components/Navbar';
 import { ProductReviews } from '../components/ProductReviews';
 import { ProductQuestions } from '../components/ProductQuestions';
 import { ProductReportModal } from '../components/ProductReportModal';
+import { useCart } from '../hooks/useCart';
 import { Flag } from 'lucide-react';
 import type { Product, ProductImage, UserProfile } from '../types/database.types';
 import './ProductPage.css';
@@ -20,6 +21,7 @@ interface ProductWithImages extends Product {
 export const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState<ProductWithImages | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
@@ -28,6 +30,8 @@ export const ProductPage = () => {
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
   const [showReportModal, setShowReportModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
 
   useEffect(() => {
     loadCurrentUser();
@@ -132,9 +136,28 @@ export const ProductPage = () => {
     setQuantity(newQuantity);
   };
 
-  const handleAddToCart = () => {
-    // TODO: Implementacja koszyka
-    alert(`Dodano ${quantity} szt. do koszyka`);
+  const handleAddToCart = async () => {
+    if (!product) return;
+
+    try {
+      setAddingToCart(true);
+      setCartMessage(null);
+      
+      await addToCart(product.id, quantity);
+      
+      setCartMessage(`Dodano ${quantity} szt. do koszyka!`);
+      setQuantity(1); // Reset quantity after adding
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setCartMessage(null);
+      }, 3000);
+    } catch (err) {
+      console.error('Error adding to cart:', err);
+      setCartMessage('Błąd podczas dodawania do koszyka');
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
   const openLightbox = (index: number) => {
@@ -302,16 +325,22 @@ export const ProductPage = () => {
                 </div>
               </div>
 
+              {cartMessage && (
+                <div className={`cart-message ${cartMessage.includes('Błąd') ? 'error' : 'success'}`}>
+                  {cartMessage}
+                </div>
+              )}
+
               <button
                 className="btn-add-to-cart-product"
                 onClick={handleAddToCart}
-                disabled={product.stock_quantity === 0}
+                disabled={product.stock_quantity === 0 || addingToCart}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path d="M9 2L7.17 4H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3.17L15 2H9z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <circle cx="12" cy="13" r="3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                Dodaj do koszyka
+                {addingToCart ? 'Dodawanie...' : 'Dodaj do koszyka'}
               </button>
             </div>
 

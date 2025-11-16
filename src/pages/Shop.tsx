@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
 import { FeaturedSlider } from '../components/FeaturedSlider';
 import { Pagination } from '../components/Pagination';
+import { useCart } from '../hooks/useCart';
 import './Shop.css';
 
 interface Category {
@@ -26,6 +27,7 @@ interface Product {
 
 export const Shop = () => {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -389,10 +391,22 @@ export const Shop = () => {
                         <span className="product-price-shop">{product.price.toFixed(2)} zł</span>
                         <button 
                           className="btn-add-to-cart"
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
-                            // TODO: Add to cart functionality
-                            alert('Dodano do koszyka');
+                            try {
+                              await addToCart(product.id, 1);
+                              // Optional: Show success feedback
+                              const btn = e.currentTarget;
+                              const originalText = btn.textContent;
+                              btn.textContent = '✓ Dodano!';
+                              btn.style.background = '#28a745';
+                              setTimeout(() => {
+                                btn.textContent = originalText;
+                                btn.style.background = '';
+                              }, 2000);
+                            } catch (err) {
+                              console.error('Error adding to cart:', err);
+                            }
                           }}
                         >
                           Dodaj do koszyka

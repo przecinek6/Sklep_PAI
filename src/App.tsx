@@ -8,6 +8,8 @@ import { MyAccount } from './pages/MyAccount';
 import { Shop } from './pages/Shop';
 import { ProductPage } from './pages/ProductPage';
 import { SearchPage } from './pages/SearchPage';
+import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
 import './App.css';
 
 function App() {
@@ -68,7 +70,11 @@ function App() {
           />
           <Route
             path="/cart"
-            element={<div>Koszyk - w budowie</div>}
+            element={<Cart />}
+          />
+          <Route
+            path="/checkout"
+            element={user ? <Checkout /> : <Navigate to="/login" state={{ from: '/checkout' }} replace />}
           />
           <Route
             path="/search"

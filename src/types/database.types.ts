@@ -59,6 +59,7 @@ export interface Product {
   created_by?: string;
   created_at?: string;
   updated_at?: string;
+  product_images?: ProductImage[];
 }
 
 export interface ProductImage {
@@ -70,6 +71,22 @@ export interface ProductImage {
   large_url?: string;
   display_order: number;
   created_at?: string;
+}
+
+export interface CartItem {
+  id: string;
+  user_id?: string;
+  session_id?: string;
+  product_id: string;
+  quantity: number;
+  created_at: string;
+  updated_at: string;
+  products?: Product;
+}
+
+export interface LocalCartItem {
+  product_id: string;
+  quantity: number;
 }
 
 export interface UserPreferences {
