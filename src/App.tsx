@@ -10,6 +10,9 @@ import { ProductPage } from './pages/ProductPage';
 import { SearchPage } from './pages/SearchPage';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import Payment from './pages/Payment';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailure from './pages/PaymentFailure';
 import './App.css';
 
 function App() {
@@ -75,6 +78,18 @@ function App() {
           <Route
             path="/checkout"
             element={user ? <Checkout /> : <Navigate to="/login" state={{ from: '/checkout' }} replace />}
+          />
+          <Route
+            path="/payment"
+            element={user ? <Payment /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/payment/success"
+            element={user ? <PaymentSuccess /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/payment/failure"
+            element={user ? <PaymentFailure /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/search"
