@@ -279,7 +279,7 @@ export const useCart = (): UseCartReturn => {
           .select('quantity')
           .eq('user_id', userId)
           .eq('product_id', productId)
-          .single();
+          .maybeSingle();
 
         const newQuantity = existingItem ? existingItem.quantity + quantity : quantity;
 

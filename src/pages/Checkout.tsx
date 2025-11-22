@@ -239,10 +239,8 @@ const Checkout: React.FC = () => {
       // Clear cart after successful order
       await clearCart();
 
-      // Redirect to order confirmation or payment page
-      // For now, we'll show a success message and redirect to orders page
-      alert(`Zamówienie ${orderNumber} zostało złożone!\nCzekamy na płatność.`);
-      navigate('/orders');
+      // Redirect to payment page
+      navigate(`/payment?order_id=${order.id}`);
     } catch (err) {
       console.error('Error in handlePlaceOrder:', err);
       setError('Wystąpił nieoczekiwany błąd podczas składania zamówienia');

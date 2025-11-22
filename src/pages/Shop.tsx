@@ -393,19 +393,26 @@ export const Shop = () => {
                           className="btn-add-to-cart"
                           onClick={async (e) => {
                             e.stopPropagation();
+                            const btn = e.currentTarget as HTMLButtonElement;
+                            const originalText = btn.innerHTML;
+                            
                             try {
-                              await addToCart(product.id, 1);
-                              // Optional: Show success feedback
-                              const btn = e.currentTarget;
-                              const originalText = btn.textContent;
-                              btn.textContent = '✓ Dodano!';
+                              btn.disabled = true;
+                              btn.innerHTML = '✓ Dodano!';
                               btn.style.background = '#28a745';
+                              
+                              await addToCart(product.id, 1);
+                              
                               setTimeout(() => {
-                                btn.textContent = originalText;
+                                btn.innerHTML = originalText;
                                 btn.style.background = '';
+                                btn.disabled = false;
                               }, 2000);
                             } catch (err) {
                               console.error('Error adding to cart:', err);
+                              btn.innerHTML = originalText;
+                              btn.style.background = '';
+                              btn.disabled = false;
                             }
                           }}
                         >
