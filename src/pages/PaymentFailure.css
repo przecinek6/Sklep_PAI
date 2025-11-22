@@ -1,0 +1,177 @@
+.payment-failure-container {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+.failure-card {
+  background: white;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.failure-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  animation: shake 0.5s ease-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.failure-card h1 {
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+  color: #dc3545;
+}
+
+.failure-message {
+  margin: 0 0 2rem 0;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.error-box {
+  background: #f8d7da;
+  border-left: 4px solid #dc3545;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.error-box p {
+  margin: 0;
+  color: #721c24;
+  font-size: 0.95rem;
+}
+
+.error-box strong {
+  font-weight: 600;
+}
+
+.info-box {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.info-box p {
+  margin: 0.5rem 0;
+  color: #856404;
+  font-size: 0.95rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.btn-retry,
+.btn-account,
+.btn-home {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-retry {
+  background: #28a745;
+  color: white;
+}
+
+.btn-retry:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-account {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-account:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-home {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-home:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .payment-failure-container {
+    margin: 2rem auto;
+  }
+
+  .failure-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .failure-card h1 {
+    font-size: 1.5rem;
+  }
+
+  .failure-message {
+    font-size: 1rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-retry,
+  .btn-account,
+  .btn-home {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .failure-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .failure-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+}
