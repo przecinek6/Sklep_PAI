@@ -4,6 +4,7 @@ import { ShoppingCart, Search, User, ChevronDown, LogOut, Settings, ShieldCheck,
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import CartIcon from './CartIcon';
+import { NotificationIcon } from './NotificationIcon';
 import './Navbar.css';
 
 interface SearchSuggestion {
@@ -330,6 +331,9 @@ export const Navbar = () => {
                 )}
               </div>
 
+              {/* Notifications */}
+              <NotificationIcon />
+              
               {/* Cart Button */}
               <CartIcon />
             </>
