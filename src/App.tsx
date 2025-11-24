@@ -13,6 +13,8 @@ import Checkout from './pages/Checkout';
 import Payment from './pages/Payment';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailure from './pages/PaymentFailure';
+import { MyOrders } from './pages/MyOrders';
+import { Settings } from './pages/Settings';
 import './App.css';
 
 function App() {
@@ -57,11 +59,11 @@ function App() {
           />
           <Route
             path="/orders"
-            element={user ? <div>Moje zamówienia - w budowie</div> : <Navigate to="/login" replace />}
+            element={user ? <MyOrders /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/settings"
-            element={user ? <div>Ustawienia - w budowie</div> : <Navigate to="/login" replace />}
+            element={user ? <Settings /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/moderator"
