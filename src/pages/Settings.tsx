@@ -213,14 +213,6 @@ export const Settings = () => {
           </p>
 
           <div className="demo-grid">
-            <div className="demo-card">
-              <h3>Przyciski</h3>
-              <div className="demo-buttons">
-                <button className="demo-btn primary">Primary</button>
-                <button className="demo-btn secondary">Secondary</button>
-                <button className="demo-btn accent">Accent</button>
-              </div>
-            </div>
 
             <div className="demo-card">
               <h3>Pola formularza</h3>

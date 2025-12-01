@@ -249,8 +249,8 @@
   margin-top: 2rem;
 }
 
-.btn-cancel,
-.btn-save {
+.settings-section .btn-cancel,
+.settings-section .btn-save {
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-size: 1rem;
@@ -260,30 +260,29 @@
   transition: all 0.2s;
 }
 
-.btn-cancel {
+.settings-section .btn-cancel {
   background-color: var(--background);
   color: var(--text-primary);
   border: 2px solid var(--border);
 }
 
-.btn-cancel:hover:not(:disabled) {
+.settings-section .btn-cancel:hover:not(:disabled) {
   background-color: var(--surface);
   border-color: var(--text-secondary);
 }
 
-.btn-save {
-  background-color: var(--primary);
+.settings-section .btn-save {
   color: white;
   border: 2px solid var(--primary);
 }
 
-.btn-save:hover:not(:disabled) {
+.settings-section .btn-save:hover:not(:disabled) {
   background-color: var(--primary-hover);
   border-color: var(--primary-hover);
 }
 
-.btn-cancel:disabled,
-.btn-save:disabled {
+.settings-section .btn-cancel:disabled,
+.settings-section .btn-save:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -317,43 +316,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-}
-
-.demo-btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-}
-
-.demo-btn.primary {
-  background-color: var(--primary);
-  color: white;
-}
-
-.demo-btn.primary:hover {
-  background-color: var(--primary-hover);
-}
-
-.demo-btn.secondary {
-  background-color: var(--secondary);
-  color: white;
-}
-
-.demo-btn.secondary:hover {
-  background-color: var(--secondary-hover);
-}
-
-.demo-btn.accent {
-  background-color: var(--accent);
-  color: white;
-}
-
-.demo-btn.accent:hover {
-  background-color: var(--accent-hover);
 }
 
 .demo-input,
@@ -452,8 +414,8 @@
     flex-direction: column;
   }
 
-  .btn-cancel,
-  .btn-save {
+  .settings-section .btn-cancel,
+  .settings-section .btn-save {
     width: 100%;
   }
 
