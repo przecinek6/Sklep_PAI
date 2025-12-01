@@ -27,27 +27,6 @@
   padding: 40px 24px;
 }
 
-.account-header {
-  text-align: center;
-  margin-bottom: 48px;
-}
-
-.account-header h1 {
-  font-size: 42px;
-  font-weight: 800;
-  margin: 0 0 12px 0;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.account-header p {
-  color: var(--text-secondary);
-  font-size: 18px;
-  margin: 0;
-}
-
 .account-content {
   background: var(--surface);
   border-radius: var(--radius-lg);
@@ -205,12 +184,6 @@
   color: var(--text-tertiary);
 }
 
-.form-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 8px 0;
-}
-
 /* Info Rows */
 .info-row {
   display: flex;
@@ -252,7 +225,7 @@
 }
 
 /* Buttons */
-.btn-primary {
+.account-page .btn-primary {
   padding: 14px 28px;
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: white;
@@ -265,16 +238,16 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.btn-primary:hover {
+.account-page .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.btn-primary:active {
+.account-page .btn-primary:active {
   transform: translateY(0);
 }
 
-.btn-primary:disabled {
+.account-page .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
@@ -461,14 +434,6 @@
     padding: 24px 16px;
   }
 
-  .account-header h1 {
-    font-size: 32px;
-  }
-
-  .account-header p {
-    font-size: 16px;
-  }
-
   .tab-content {
     padding: 24px 20px;
   }
@@ -508,9 +473,6 @@
 }
 
 @media (max-width: 480px) {
-  .account-header h1 {
-    font-size: 28px;
-  }
 
   .tab-button {
     min-width: 100%;

@@ -256,15 +256,6 @@ export const MyAccount = () => {
       <Navbar />
       
       <div className="account-container">
-        <motion.div
-          className="account-header"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1>Moje Konto</h1>
-          <p>Zarządzaj swoimi danymi osobowymi i ustawieniami</p>
-        </motion.div>
 
         <div className="account-content">
           {/* Tabs Navigation */}
@@ -369,8 +360,6 @@ export const MyAccount = () => {
                       }) : 'Brak danych'}
                     </div>
                   </div>
-
-                  <div className="form-divider" />
 
                   <div className="form-row">
                     <div className="form-group">
