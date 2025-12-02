@@ -368,6 +368,57 @@ export const OrderManagement = () => {
                 ))}
               </tbody>
             </table>
+
+            {/* Mobilny układ kart */}
+            <div className="orders-mobile-cards">
+              {orders.map((order) => (
+                <div key={order.id} className="order-card-mobile">
+                  <div className="order-card-header">
+                    <div>
+                      <div className="order-card-number">{order.order_number}</div>
+                      <div className="order-card-date">
+                        {new Date(order.created_at).toLocaleDateString('pl-PL')}
+                      </div>
+                    </div>
+                    <div>{order.total_amount.toFixed(2)} PLN</div>
+                  </div>
+
+                  <div className="order-card-body">
+                    <div className="order-card-row">
+                      <span className="order-card-label">Klient:</span>
+                      <span className="order-card-value">
+                        {order.user_profiles?.first_name 
+                          ? `${order.user_profiles.first_name} ${order.user_profiles.last_name}`
+                          : order.user_profiles?.email || 'N/A'}
+                      </span>
+                    </div>
+
+                    <div className="order-card-row">
+                      <span className="order-card-label">Status:</span>
+                      <span className={`badge ${getStatusBadgeClass(order.status)}`}>
+                        {statusLabels[order.status]}
+                      </span>
+                    </div>
+
+                    <div className="order-card-row">
+                      <span className="order-card-label">Płatność:</span>
+                      <span className={`badge ${getPaymentBadgeClass(order.payment_status)}`}>
+                        {paymentLabels[order.payment_status]}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="order-card-footer">
+                    <button
+                      onClick={() => loadOrderDetails(order.id)}
+                      className="btn-details"
+                    >
+                      Zobacz szczegóły
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <Pagination
@@ -461,10 +512,10 @@ export const OrderManagement = () => {
                     <tbody>
                       {selectedOrder.order_items.map((item) => (
                         <tr key={item.id}>
-                          <td>{item.products?.name || 'Nieznany produkt'}</td>
-                          <td>{item.price.toFixed(2)} PLN</td>
-                          <td>{item.quantity}</td>
-                          <td>{(item.price * item.quantity).toFixed(2)} PLN</td>
+                          <td data-label="Produkt">{item.products?.name || 'Nieznany produkt'}</td>
+                          <td data-label="Cena jedn.">{item.price.toFixed(2)} PLN</td>
+                          <td data-label="Ilość">{item.quantity}</td>
+                          <td data-label="Suma">{(item.price * item.quantity).toFixed(2)} PLN</td>
                         </tr>
                       ))}
                     </tbody>
