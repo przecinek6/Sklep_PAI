@@ -240,6 +240,9 @@ export const Shop = () => {
     const from = (page - 1) * productsPerPage;
     const to = from + productsPerPage - 1;
 
+    // Scroll to top of products section
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (!selectedCategory) {
       // Load all products
       const { data } = await supabase
