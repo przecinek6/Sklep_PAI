@@ -173,7 +173,8 @@
   margin-top: 24px;
 }
 
-.btn-primary {
+.product-reviews .btn-primary,
+.review-form-section .btn-primary {
   padding: 12px 24px;
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: white;
@@ -185,12 +186,14 @@
   transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
+.product-reviews .btn-primary:hover,
+.review-form-section .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.btn-secondary {
+.product-reviews .btn-secondary,
+.review-form-section .btn-secondary {
   padding: 12px 24px;
   background: white;
   color: var(--text-primary);
@@ -202,7 +205,8 @@
   transition: all 0.3s ease;
 }
 
-.btn-secondary:hover {
+.product-reviews .btn-secondary:hover,
+.review-form-section .btn-secondary:hover {
   background: var(--surface);
   border-color: var(--primary-color);
 }

@@ -36,7 +36,7 @@ export const ProductReviews = ({ productId, currentUserId }: ProductReviewsProps
         .from('product_reviews')
         .select(`
           *,
-          user_profiles (
+          user_profiles!product_reviews_user_id_fkey (
             id,
             first_name,
             last_name,
