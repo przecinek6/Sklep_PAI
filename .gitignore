@@ -19,8 +19,6 @@ dist-ssr
 
 # Project requirements (private notes)
 wymagania-projektu.md
-database
-supabase
 
 # Editor directories and files
 .vscode/*
