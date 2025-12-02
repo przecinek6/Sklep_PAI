@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminCheck } from '../hooks/useAdminCheck';
+import { Navbar } from '../components/Navbar';
 import { ProductManager } from '../components/admin/ProductManager';
 import OrderManagement from '../components/moderator/OrderManagement';
 import ReviewModeration from '../components/moderator/ReviewModeration';
@@ -17,9 +18,12 @@ const ModeratorPanel = () => {
 
   if (loading) {
     return (
-      <div className="moderator-panel-container">
-        <div className="loading">Ładowanie...</div>
-      </div>
+      <>
+        <Navbar />
+        <div className="moderator-panel-container">
+          <div className="loading">Ładowanie...</div>
+        </div>
+      </>
     );
   }
 
@@ -29,7 +33,9 @@ const ModeratorPanel = () => {
   }
 
   return (
-    <div className="moderator-panel-container">
+    <>
+      <Navbar />
+      <div className="moderator-panel-container">
       <div className="moderator-panel-header">
         <h1>Panel Moderatora</h1>
         <p>Zarządzaj produktami, zamówieniami, opiniami i zgłoszeniami</p>
@@ -76,6 +82,7 @@ const ModeratorPanel = () => {
         {activeTab === 'reports' && <ReportManagement />}
       </div>
     </div>
+    </>
   );
 };
 
