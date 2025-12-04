@@ -47,6 +47,16 @@ export interface Category {
   updated_at?: string;
 }
 
+export interface ModeratorCategory {
+  id: string;
+  moderator_id: string;
+  category_id: string;
+  assigned_by?: string;
+  assigned_at: string;
+  categories?: Category;
+  user_profiles?: UserProfile;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -150,22 +160,16 @@ export interface ProductQuestion {
   id: string;
   product_id: string;
   user_id: string;
-  question: string;
+  parent_id?: string | null; // null = question, not null = answer
+  content: string;
   is_answered: boolean;
   created_at: string;
   updated_at: string;
   user_profiles?: UserProfile;
 }
 
-export interface ProductQuestionAnswer {
-  id: string;
-  question_id: string;
-  user_id: string;
-  answer: string;
-  created_at: string;
-  updated_at: string;
-  user_profiles?: UserProfile;
-}
+// Type alias for backward compatibility
+export type ProductQuestionAnswer = ProductQuestion;
 
 export interface ProductReport {
   id: string;
@@ -222,31 +226,46 @@ export interface OrderItem {
   products?: Product;
 }
 
-export type EmailNotificationStatus = 'pending' | 'sent' | 'failed' | 'cancelled';
+export type EmailNotificationStatus = 'pending' | 'sent' | 'failed';
+export type DeliveryMethod = 'in_app' | 'email' | 'both';
 export type NotificationType = 
-  | 'order_created'
-  | 'order_status_changed'
+  | 'order_status'
   | 'order_cancelled'
-  | 'payment_confirmed'
+  | 'payment_success'
   | 'payment_failed'
   | 'review_approved'
   | 'review_rejected'
   | 'question_answered'
-  | 'report_responded'
-  | 'report_resolved';
+  | 'report_response'
+  | 'product_added'
+  | 'system';
 
-export interface EmailNotification {
+export interface Notification {
   id: string;
   user_id: string;
   notification_type: NotificationType;
-  subject: string;
-  body: string;
-  email_to: string;
-  status: EmailNotificationStatus;
-  sent_at?: string;
-  error_message?: string;
-  retry_count: number;
-  metadata?: Record<string, any>;
+  
+  // Common fields
+  title: string;
+  message: string;
+  link?: string | null;
+  metadata?: Record<string, any> | null;
   created_at: string;
-  updated_at: string;
+  
+  // In-app notification fields
+  is_read: boolean;
+  read_at?: string | null;
+  
+  // Email notification fields
+  delivery_method: DeliveryMethod;
+  email_to?: string | null;
+  email_subject?: string | null;
+  email_body?: string | null;
+  email_status?: EmailNotificationStatus | null;
+  email_sent_at?: string | null;
+  email_error_message?: string | null;
+  email_retry_count: number;
 }
+
+// Type alias for backward compatibility
+export type EmailNotification = Notification;
