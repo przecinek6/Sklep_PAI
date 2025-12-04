@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Pagination } from '../Pagination';
 import { usePagination } from '../../hooks/usePagination';
-import type { UserProfile, UserRole } from '../../types/database.types';
+import type { UserProfile, UserRole, Category, ModeratorCategory } from '../../types/database.types';
 import './UserManager.css';
 
 interface BanFormData {
@@ -32,11 +32,19 @@ interface NotificationModal {
   message: string;
 }
 
+interface CategoryAssignmentData {
+  userId: string;
+  userName: string;
+  selectedCategories: string[];
+}
+
 export const UserManager = () => {
   const [users, setUsers] = useState<UserWithBanInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBanModal, setShowBanModal] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [notification, setNotification] = useState<NotificationModal>({
     show: false,
     type: 'success',
@@ -48,6 +56,11 @@ export const UserManager = () => {
     userId: '', 
     currentRole: 'user', 
     newRole: 'user' 
+  });
+  const [categoryAssignment, setCategoryAssignment] = useState<CategoryAssignmentData>({
+    userId: '',
+    userName: '',
+    selectedCategories: []
   });
   const [currentAdminId, setCurrentAdminId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,6 +96,7 @@ export const UserManager = () => {
   useEffect(() => {
     loadCurrentAdmin();
     loadUsers();
+    loadCategories();
   }, []);
 
   const loadCurrentAdmin = async () => {
@@ -123,6 +137,21 @@ export const UserManager = () => {
       console.error('Error loading users:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error('Error loading categories:', error);
     }
   };
 
@@ -211,6 +240,78 @@ export const UserManager = () => {
     } catch (error) {
       console.error('Error changing user role:', error);
       showNotification('error', 'Błąd', 'Nie udało się zmienić roli użytkownika');
+    }
+  };
+
+  const handleManageCategories = async (userId: string, userName: string) => {
+    try {
+      // Pobierz przypisane kategorie moderatora
+      const { data, error } = await supabase
+        .from('moderator_categories')
+        .select('category_id')
+        .eq('moderator_id', userId);
+
+      if (error) throw error;
+
+      setCategoryAssignment({
+        userId,
+        userName,
+        selectedCategories: data?.map(mc => mc.category_id) || []
+      });
+      setShowCategoryModal(true);
+    } catch (error) {
+      console.error('Error loading moderator categories:', error);
+      showNotification('error', 'Błąd', 'Nie udało się załadować przypisanych kategorii');
+    }
+  };
+
+  const toggleCategory = (categoryId: string) => {
+    setCategoryAssignment(prev => ({
+      ...prev,
+      selectedCategories: prev.selectedCategories.includes(categoryId)
+        ? prev.selectedCategories.filter(id => id !== categoryId)
+        : [...prev.selectedCategories, categoryId]
+    }));
+  };
+
+  const submitCategoryAssignment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      // Usuń wszystkie poprzednie przypisania
+      const { error: deleteError } = await supabase
+        .from('moderator_categories')
+        .delete()
+        .eq('moderator_id', categoryAssignment.userId);
+
+      if (deleteError) throw deleteError;
+
+      // Dodaj nowe przypisania
+      if (categoryAssignment.selectedCategories.length > 0) {
+        const assignments = categoryAssignment.selectedCategories.map(categoryId => ({
+          moderator_id: categoryAssignment.userId,
+          category_id: categoryId,
+          assigned_by: currentAdminId
+        }));
+
+        const { error: insertError } = await supabase
+          .from('moderator_categories')
+          .insert(assignments);
+
+        if (insertError) throw insertError;
+      }
+
+      setShowCategoryModal(false);
+      showNotification(
+        'success', 
+        'Sukces', 
+        categoryAssignment.selectedCategories.length === 0
+          ? 'Moderator ma dostęp do wszystkich kategorii'
+          : `Przypisano ${categoryAssignment.selectedCategories.length} kategorii`
+      );
+    } catch (error) {
+      console.error('Error assigning categories:', error);
+      showNotification('error', 'Błąd', 'Nie udało się zapisać przypisań kategorii');
     }
   };
 
@@ -325,6 +426,18 @@ export const UserManager = () => {
                             title="Zmień rolę"
                           >
                             Zmień
+                          </button>
+                        )}
+                        {user.role === 'moderator' && (
+                          <button
+                            className="btn-categories"
+                            onClick={() => handleManageCategories(
+                              user.id,
+                              `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email
+                            )}
+                            title="Przypisz kategorie"
+                          >
+                            Kategorie
                           </button>
                         )}
                       </div>
@@ -476,6 +589,62 @@ export const UserManager = () => {
                 </button>
                 <button type="submit" className="btn-primary">
                   Zmień rolę
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showCategoryModal && (
+        <div className="modal-overlay" onClick={() => setShowCategoryModal(false)}>
+          <div className="modal-content category-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Przypisz kategorie moderatorowi</h3>
+            <p className="modal-subtitle">
+              Moderator: <strong>{categoryAssignment.userName}</strong>
+            </p>
+            <form onSubmit={submitCategoryAssignment}>
+              <div className="form-group">
+                <label>
+                  Wybierz kategorie
+                </label>
+                <p className="form-hint">
+                  Jeśli nie wybierzesz żadnej kategorii, moderator będzie miał dostęp do wszystkich produktów.
+                </p>
+                <div className="categories-list">
+                  {categories.length === 0 ? (
+                    <p className="no-categories">Brak aktywnych kategorii</p>
+                  ) : (
+                    categories.map(category => (
+                      <label key={category.id} className="category-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={categoryAssignment.selectedCategories.includes(category.id)}
+                          onChange={() => toggleCategory(category.id)}
+                        />
+                        <span className="category-name">{category.name}</span>
+                        {category.description && (
+                          <span className="category-description">{category.description}</span>
+                        )}
+                      </label>
+                    ))
+                  )}
+                </div>
+                <p className="selected-count">
+                  Wybrano: <strong>{categoryAssignment.selectedCategories.length}</strong> kategorii
+                </p>
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowCategoryModal(false)}
+                >
+                  Anuluj
+                </button>
+                <button type="submit" className="btn-primary">
+                  Zapisz przypisania
                 </button>
               </div>
             </form>
