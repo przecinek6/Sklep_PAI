@@ -29,7 +29,7 @@ export const ProductQuestions = ({ productId, currentUserId, userRole }: Product
     try {
       setLoading(true);
       
-      // Load questions
+      // Load questions (parent_id is null)
       const { data: questionsData, error: questionsError } = await supabase
         .from('product_questions')
         .select(`
@@ -43,18 +43,19 @@ export const ProductQuestions = ({ productId, currentUserId, userRole }: Product
           )
         `)
         .eq('product_id', productId)
+        .is('parent_id', null)
         .order('created_at', { ascending: false });
 
       if (questionsError) throw questionsError;
 
       setQuestions(questionsData || []);
 
-      // Load all answers for these questions
+      // Load all answers (where parent_id is not null)
       if (questionsData && questionsData.length > 0) {
         const questionIds = questionsData.map(q => q.id);
         
         const { data: answersData, error: answersError } = await supabase
-          .from('product_question_answers')
+          .from('product_questions')
           .select(`
             *,
             user_profiles (
@@ -66,18 +67,18 @@ export const ProductQuestions = ({ productId, currentUserId, userRole }: Product
               role
             )
           `)
-          .in('question_id', questionIds)
+          .in('parent_id', questionIds)
           .order('created_at', { ascending: true });
 
         if (answersError) throw answersError;
 
-        // Group answers by question_id
+        // Group answers by parent_id
         const answersMap: Record<string, ProductQuestionAnswer[]> = {};
         answersData?.forEach(answer => {
-          if (!answersMap[answer.question_id]) {
-            answersMap[answer.question_id] = [];
+          if (!answersMap[answer.parent_id!]) {
+            answersMap[answer.parent_id!] = [];
           }
-          answersMap[answer.question_id].push(answer);
+          answersMap[answer.parent_id!].push(answer);
         });
 
         setAnswers(answersMap);
@@ -103,7 +104,8 @@ export const ProductQuestions = ({ productId, currentUserId, userRole }: Product
         .insert({
           product_id: productId,
           user_id: currentUserId,
-          question: newQuestion.trim(),
+          parent_id: null,
+          content: newQuestion.trim(),
         });
 
       if (insertError) throw insertError;
@@ -126,11 +128,12 @@ export const ProductQuestions = ({ productId, currentUserId, userRole }: Product
       setError(null);
 
       const { error: insertError } = await supabase
-        .from('product_question_answers')
+        .from('product_questions')
         .insert({
-          question_id: questionId,
+          product_id: productId,
           user_id: currentUserId,
-          answer: answerText,
+          parent_id: questionId,
+          content: answerText,
         });
 
       if (insertError) throw insertError;
@@ -238,7 +241,7 @@ export const ProductQuestions = ({ productId, currentUserId, userRole }: Product
 
               <div className="question-content">
                 <MessageCircle size={20} className="question-icon" />
-                <p>{question.question}</p>
+                <p>{question.content}</p>
               </div>
 
               {/* Answers */}
@@ -274,7 +277,7 @@ export const ProductQuestions = ({ productId, currentUserId, userRole }: Product
                           </div>
                         </div>
                       </div>
-                      <p className="answer-content">{answer.answer}</p>
+                      <p className="answer-content">{answer.content}</p>
                     </div>
                   ))}
                 </div>

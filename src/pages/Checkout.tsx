@@ -216,14 +216,17 @@ const Checkout: React.FC = () => {
 
       // Create email notification
       const { error: emailError } = await supabase
-        .from('email_notifications')
+        .from('notifications')
         .insert({
           user_id: user.id,
-          notification_type: 'order_created',
-          subject: `Potwierdzenie zamówienia ${orderNumber}`,
-          body: `Twoje zamówienie ${orderNumber} zostało złożone. Oczekujemy na płatność.`,
+          notification_type: 'order_status',
+          delivery_method: 'email',
+          title: `Potwierdzenie zamówienia ${orderNumber}`,
+          message: `Twoje zamówienie ${orderNumber} zostało złożone. Oczekujemy na płatność.`,
           email_to: user.email || '',
-          status: 'pending',
+          email_subject: `Potwierdzenie zamówienia ${orderNumber}`,
+          email_body: `Twoje zamówienie ${orderNumber} zostało złożone. Oczekujemy na płatność.`,
+          email_status: 'pending',
           metadata: {
             order_id: order.id,
             order_number: orderNumber,
