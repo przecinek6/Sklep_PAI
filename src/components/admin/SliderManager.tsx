@@ -409,12 +409,9 @@ export const SliderManager = () => {
   return (
     <div className="slider-manager">
       <div className="slider-header">
-        <div>
-          <h2>Zarządzanie sliderem</h2>
-          <p className="slider-hint">Twórz szablony slidera i zarządzaj produktami</p>
-        </div>
+        <h2>Zarządzanie sliderem</h2>
         <button
-          className="btn-primary"
+          className={showForm ? "btn-cancel-slider" : "btn-add-slider"}
           onClick={() => setShowForm(!showForm)}
         >
           {showForm ? 'Anuluj' : 'Nowy szablon'}
@@ -438,7 +435,7 @@ export const SliderManager = () => {
             <button type="submit" className="btn-primary">
               {editingTemplate ? 'Zapisz zmiany' : 'Utwórz szablon'}
             </button>
-            <button type="button" className="btn-secondary" onClick={resetForm}>
+            <button type="button" className="btn-cancel-form" onClick={resetForm}>
               Anuluj
             </button>
           </div>
