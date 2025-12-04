@@ -470,7 +470,7 @@ export const ProductManager = () => {
       <div className="product-header">
         <h2>Zarządzanie produktami</h2>
         <button
-          className="btn-primary"
+          className={showForm ? "btn-cancel-product" : "btn-add-product"}
           onClick={() => setShowForm(!showForm)}
         >
           {showForm ? 'Anuluj' : 'Dodaj produkt'}
@@ -723,7 +723,7 @@ export const ProductManager = () => {
             <button type="submit" className="btn-primary" disabled={uploadingImages}>
               {uploadingImages ? 'Przesyłanie...' : editingProduct ? 'Zapisz zmiany' : 'Utwórz produkt'}
             </button>
-            <button type="button" className="btn-secondary" onClick={resetForm}>
+            <button type="button" className="btn-cancel-form" onClick={resetForm}>
               Anuluj
             </button>
           </div>

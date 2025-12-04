@@ -468,7 +468,7 @@ export const CategoryManager = () => {
       <div className="category-header">
         <h2>Zarządzanie kategoriami</h2>
         <button
-          className="btn-primary"
+          className={showForm ? "btn-cancel-category" : "btn-add-category"}
           onClick={() => setShowForm(!showForm)}
         >
           {showForm ? 'Anuluj' : 'Dodaj kategorię'}
@@ -538,7 +538,7 @@ export const CategoryManager = () => {
                 <button type="submit" className="btn-primary">
                   {editingCategory ? 'Zapisz zmiany' : 'Utwórz kategorię'}
                 </button>
-                <button type="button" className="btn-secondary" onClick={resetForm}>
+                <button type="button" className="btn-cancel-form" onClick={resetForm}>
                   Anuluj
                 </button>
               </div>

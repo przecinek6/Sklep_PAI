@@ -4,26 +4,26 @@
   max-width: 100%;
 }
 
-.user-manager-header {
+.user-manager .user-manager-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 24px;
 }
 
-.user-manager-header h2 {
+.user-manager .user-manager-header h2 {
   margin: 0 0 8px 0;
   font-size: 24px;
   color: var(--text-primary);
 }
 
-.user-manager-hint {
+.user-manager .user-manager-hint {
   color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
 }
 
-.user-manager-loading {
+.user-manager .user-manager-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,14 +33,14 @@
 }
 
 /* Filters */
-.user-filters {
+.user-manager .user-filters {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
-.search-input {
+.user-manager .search-input {
   flex: 1;
   min-width: 250px;
   padding: 10px 16px;
@@ -51,7 +51,7 @@
   color: var(--text-primary);
 }
 
-.filter-select {
+.user-manager .filter-select {
   padding: 10px 16px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -62,7 +62,7 @@
 }
 
 /* Users Table */
-.users-table-container {
+.user-manager .users-table-container {
   background: var(--background);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -72,18 +72,18 @@
   max-width: 100%;
 }
 
-.users-table {
+.user-manager .users-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
 }
 
-.users-table thead {
+.user-manager .users-table thead {
   background: var(--surface);
   border-bottom: 2px solid var(--border);
 }
 
-.users-table th {
+.user-manager .users-table th {
   padding: 16px;
   text-align: left;
   font-size: 13px;
@@ -93,44 +93,44 @@
   letter-spacing: 0.5px;
 }
 
-.users-table tbody tr {
+.user-manager .users-table tbody tr {
   border-bottom: 1px solid var(--border);
   transition: background 0.2s ease;
 }
 
-.users-table tbody tr:hover {
+.user-manager .users-table tbody tr:hover {
   border: 2px solid var(--primary-color);
 }
 
-.users-table tbody tr.banned-row {
+.user-manager .users-table tbody tr.banned-row {
   background: rgba(239, 68, 68, 0.05);
 }
 
-.users-table td {
+.user-manager .users-table td {
   padding: 16px;
   font-size: 14px;
   color: var(--text-primary);
 }
 
-.user-email {
+.user-manager .user-email {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.username {
+.user-manager .username {
   font-size: 12px;
   color: var(--text-secondary);
 }
 
 /* Role Badges */
-.role-cell {
+.user-manager .role-cell {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.role-badge {
+.user-manager .role-badge {
   display: inline-block;
   padding: 4px 10px;
   border-radius: 6px;
@@ -138,22 +138,22 @@
   font-weight: 600;
 }
 
-.role-badge-admin {
+.user-manager .role-badge-admin {
   background: rgba(147, 51, 234, 0.1);
   color: rgb(147, 51, 234);
 }
 
-.role-badge-moderator {
+.user-manager .role-badge-moderator {
   background: rgba(59, 130, 246, 0.1);
   color: rgb(59, 130, 246);
 }
 
-.role-badge-user {
+.user-manager .role-badge-user {
   background: rgba(107, 114, 128, 0.1);
   color: rgb(107, 114, 128);
 }
 
-.btn-change-role {
+.user-manager .btn-change-role {
   padding: 4px 10px;
   background: var(--primary-light);
   color: var(--primary-color);
@@ -166,13 +166,13 @@
   white-space: nowrap;
 }
 
-.btn-change-role:hover {
+.user-manager .btn-change-role:hover {
   background: rgba(37, 99, 235, 0.2);
   border-color: rgba(37, 99, 235, 0.5);
 }
 
 /* Status Badges */
-.status-badge {
+.user-manager .status-badge {
   display: inline-block;
   padding: 4px 10px;
   border-radius: 6px;
@@ -180,30 +180,30 @@
   font-weight: 600;
 }
 
-.status-active {
+.user-manager .status-active {
   background: rgba(34, 197, 94, 0.1);
   color: rgb(34, 197, 94);
 }
 
-.status-banned {
+.user-manager .status-banned {
   background: rgba(239, 68, 68, 0.1);
   color: rgb(239, 68, 68);
 }
 
 /* User Actions */
-.user-actions {
+.user-manager .user-actions {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.current-user-label {
+.user-manager .current-user-label {
   font-size: 12px;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-.btn-ban {
+.user-manager .btn-ban {
   padding: 6px 14px;
   background: rgba(239, 68, 68, 0.1);
   color: rgb(239, 68, 68);
@@ -215,12 +215,12 @@
   transition: all 0.2s ease;
 }
 
-.btn-ban:hover {
+.user-manager .btn-ban:hover {
   background: rgba(239, 68, 68, 0.2);
   border-color: rgba(239, 68, 68, 0.5);
 }
 
-.btn-unban {
+.user-manager .btn-unban {
   padding: 6px 14px;
   background: rgba(34, 197, 94, 0.1);
   color: rgb(34, 197, 94);
@@ -232,18 +232,18 @@
   transition: all 0.2s ease;
 }
 
-.btn-unban:hover {
+.user-manager .btn-unban:hover {
   background: rgba(34, 197, 94, 0.2);
   border-color: rgba(34, 197, 94, 0.5);
 }
 
 /* Ban Reason Tooltip */
-.ban-reason-tooltip {
+.user-manager .ban-reason-tooltip {
   position: relative;
   display: inline-block;
 }
 
-.info-icon {
+.user-manager .info-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -256,7 +256,7 @@
   cursor: help;
 }
 
-.tooltip-content {
+.user-manager .tooltip-content {
   visibility: hidden;
   opacity: 0;
   position: absolute;
@@ -275,13 +275,13 @@
   transition: all 0.2s ease;
 }
 
-.ban-reason-tooltip:hover .tooltip-content {
+.user-manager .ban-reason-tooltip:hover .tooltip-content {
   visibility: visible;
   opacity: 1;
 }
 
 /* No Users State */
-.no-users {
+.user-manager .no-users {
   background: var(--background);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -289,14 +289,14 @@
   text-align: center;
 }
 
-.no-users p {
+.user-manager .no-users p {
   color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
 }
 
 /* Modal Styles */
-.modal-overlay {
+.user-manager .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -310,7 +310,7 @@
   padding: 20px;
 }
 
-.modal-content {
+.user-manager .modal-content {
   background: var(--background);
   border-radius: 16px;
   padding: 32px;
@@ -319,17 +319,17 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.modal-content h3 {
+.user-manager .modal-content h3 {
   margin: 0 0 24px 0;
   font-size: 20px;
   color: var(--text-primary);
 }
 
-.form-group {
+.user-manager .form-group {
   margin-bottom: 24px;
 }
 
-.form-group label {
+.user-manager .form-group label {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
@@ -337,11 +337,11 @@
   color: var(--text-primary);
 }
 
-.required {
+.user-manager .required {
   color: rgb(239, 68, 68);
 }
 
-.form-group textarea {
+.user-manager .form-group textarea {
   width: 100%;
   padding: 12px;
   border: 1px solid var(--border);
@@ -353,13 +353,13 @@
   resize: vertical;
 }
 
-.form-group textarea:focus {
+.user-manager .form-group textarea:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px var(--primary-light);
 }
 
-.role-select {
+.user-manager .role-select {
   width: 100%;
   padding: 12px;
   border: 1px solid var(--border);
@@ -370,25 +370,25 @@
   cursor: pointer;
 }
 
-.role-select:focus {
+.user-manager .role-select:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px var(--primary-light);
 }
 
-.form-hint {
+.user-manager .form-hint {
   margin: 8px 0 0 0;
   font-size: 12px;
   color: var(--text-secondary);
 }
 
-.modal-actions {
+.user-manager .modal-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
 }
 
-.btn-secondary {
+.user-manager .btn-secondary {
   padding: 10px 20px;
   background: var(--surface);
   color: var(--text-primary);
@@ -400,11 +400,11 @@
   transition: all 0.2s ease;
 }
 
-.btn-secondary:hover {
+.user-manager .btn-secondary:hover {
   background: var(--border);
 }
 
-.btn-danger {
+.user-manager .btn-danger {
   padding: 10px 20px;
   background: rgb(239, 68, 68);
   color: white;
@@ -416,11 +416,11 @@
   transition: all 0.2s ease;
 }
 
-.btn-danger:hover {
+.user-manager .btn-danger:hover {
   background: rgb(220, 38, 38);
 }
 
-.btn-primary {
+.user-manager .btn-primary {
   padding: 10px 20px;
   background: var(--primary-color);
   color: white;
@@ -432,12 +432,12 @@
   transition: all 0.2s ease;
 }
 
-.btn-primary:hover {
+.user-manager .btn-primary:hover {
   background: var(--primary-hover);
 }
 
 /* Notification Modal */
-.notification-modal {
+.user-manager .notification-modal {
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -445,7 +445,7 @@
   z-index: 10000;
 }
 
-.notification-content {
+.user-manager .notification-content {
   background: var(--background);
   border-radius: 12px;
   padding: 24px;
@@ -456,11 +456,11 @@
   border: 2px solid;
 }
 
-.notification-content.success {
+.user-manager .notification-content.success {
   border-color: #22c55e;
 }
 
-.notification-content.error {
+.user-manager .notification-content.error {
   border-color: #ef4444;
 }
 
@@ -475,14 +475,14 @@
   }
 }
 
-.notification-header {
+.user-manager .notification-header {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
 }
 
-.notification-icon {
+.user-manager .notification-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -494,23 +494,23 @@
   flex-shrink: 0;
 }
 
-.notification-content.success .notification-icon {
+.user-manager .notification-content.success .notification-icon {
   background: #22c55e;
   color: white;
 }
 
-.notification-content.error .notification-icon {
+.user-manager .notification-content.error .notification-icon {
   background: #ef4444;
   color: white;
 }
 
-.notification-header h3 {
+.user-manager .notification-header h3 {
   margin: 0;
   font-size: 18px;
   color: var(--text-primary);
 }
 
-.notification-message {
+.user-manager .notification-message {
   margin: 0;
   color: var(--text-secondary);
   font-size: 14px;
@@ -523,31 +523,31 @@
     overflow-x: hidden;
   }
 
-  .user-manager-header {
+  .user-manager .user-manager-header {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
   }
 
-  .user-manager-header h2 {
+  .user-manager .user-manager-header h2 {
     font-size: 22px;
   }
 
-  .user-filters {
+  .user-manager .user-filters {
     flex-direction: column;
   }
 
-  .search-input {
+  .user-manager .search-input {
     min-width: 100%;
     width: 100%;
   }
 
-  .filter-select {
+  .user-manager .filter-select {
     width: 100%;
   }
 
   /* Ukryj tabelę na mobile - zamień na karty */
-  .users-table-container {
+  .user-manager .users-table-container {
     overflow: visible;
     border: none;
     background: transparent;
@@ -555,26 +555,26 @@
     max-width: 100%;
   }
 
-  .users-table {
+  .user-manager .users-table {
     width: 100%;
     max-width: 100%;
     min-width: auto !important;
   }
 
-  .users-table thead {
+  .user-manager .users-table thead {
     display: none;
   }
 
-  .users-table,
-  .users-table tbody,
-  .users-table tr {
+  .user-manager .users-table,
+  .user-manager .users-table tbody,
+  .user-manager .users-table tr {
     display: block;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
   }
 
-  .users-table tbody tr {
+  .user-manager .users-table tbody tr {
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -589,12 +589,12 @@
     gap: 16px 32px;
   }
 
-  .users-table tbody tr.banned-row {
+  .user-manager .users-table tbody tr.banned-row {
     background: rgba(239, 68, 68, 0.05);
     border-color: rgba(239, 68, 68, 0.3);
   }
 
-  .users-table td {
+  .user-manager .users-table td {
     display: flex;
     flex-direction: column;
     padding: 0;
@@ -605,7 +605,7 @@
     box-sizing: border-box;
   }
 
-  .users-table td:before {
+  .user-manager .users-table td:before {
     content: attr(data-label);
     display: block;
     font-weight: 600;
@@ -617,38 +617,38 @@
   }
 
   /* Lewa kolumna */
-  .users-table td:nth-child(1) { /* Email */
+  .user-manager .users-table td:nth-child(1) { /* Email */
     grid-column: 1;
     grid-row: 1;
   }
 
-  .users-table td:nth-child(2) { /* Imię i nazwisko */
+  .user-manager .users-table td:nth-child(2) { /* Imię i nazwisko */
     grid-column: 1;
     grid-row: 2;
   }
 
-  .users-table td:nth-child(5) { /* Data utworzenia */
+  .user-manager .users-table td:nth-child(5) { /* Data utworzenia */
     grid-column: 1;
     grid-row: 3;
   }
 
   /* Prawa kolumna */
-  .users-table td:nth-child(3) { /* Rola */
+  .user-manager .users-table td:nth-child(3) { /* Rola */
     grid-column: 2;
     grid-row: 1;
   }
 
-  .users-table td:nth-child(4) { /* Status */
+  .user-manager .users-table td:nth-child(4) { /* Status */
     grid-column: 2;
     grid-row: 2;
   }
 
-  .users-table td:nth-child(6) { /* Akcje */
+  .user-manager .users-table td:nth-child(6) { /* Akcje */
     grid-column: 2;
     grid-row: 3;
   }
 
-  .user-email {
+  .user-manager .user-email {
     flex-direction: column;
     align-items: flex-start !important;
     gap: 4px;
@@ -656,11 +656,11 @@
     word-break: break-word;
   }
 
-  .username {
+  .user-manager .username {
     font-size: 13px;
   }
 
-  .role-cell {
+  .user-manager .role-cell {
     flex-direction: row;
     align-items: center !important;
     justify-content: flex-start;
@@ -668,7 +668,7 @@
     flex-wrap: wrap;
   }
 
-  .user-actions {
+  .user-manager .user-actions {
     flex-direction: row;
     gap: 8px;
     width: 100%;
@@ -676,14 +676,14 @@
     justify-content: flex-start;
   }
 
-  .user-actions button {
+  .user-manager .user-actions button {
     flex: 1;
     min-width: 120px;
     font-size: 13px;
     padding: 8px 16px;
   }
 
-  .current-user-label {
+  .user-manager .current-user-label {
     width: 100%;
     text-align: left;
     padding: 8px 12px;
@@ -693,17 +693,17 @@
     font-weight: 600;
   }
 
-  .modal-content {
+  .user-manager .modal-content {
     padding: 24px 20px;
   }
 
-  .modal-actions {
+  .user-manager .modal-actions {
     flex-direction: column;
   }
 
-  .btn-secondary,
-  .btn-danger,
-  .btn-primary {
+  .user-manager .btn-secondary,
+  .user-manager .btn-danger,
+  .user-manager .btn-primary {
     width: 100%;
   }
 }
@@ -713,81 +713,81 @@
     padding: 0;
   }
 
-  .user-manager-header h2 {
+  .user-manager .user-manager-header h2 {
     font-size: 20px;
   }
 
-  .user-manager-hint {
+  .user-manager .user-manager-hint {
     font-size: 13px;
   }
 
-  .users-table tbody tr {
+  .user-manager .users-table tbody tr {
     padding: 16px;
     margin-bottom: 12px;
   }
 
-  .users-table td {
+  .user-manager .users-table td {
     padding: 8px 0;
     font-size: 14px;
   }
 
-  .users-table td:before {
+  .user-manager .users-table td:before {
     font-size: 10px;
     margin-bottom: 4px;
   }
 
-  .role-badge,
-  .status-badge {
+  .user-manager .role-badge,
+  .user-manager .status-badge {
     font-size: 11px;
     padding: 4px 8px;
   }
 
-  .btn-change-role {
+  .user-manager .btn-change-role {
     font-size: 11px;
     padding: 5px 10px;
   }
 
-  .btn-ban,
-  .btn-unban {
+  .user-manager .btn-ban,
+  .user-manager .btn-unban {
     font-size: 12px;
     padding: 7px 12px;
   }
 
-  .user-actions {
+  .user-manager .user-actions {
     flex-direction: column;
   }
 
-  .user-actions button {
+  .user-manager .user-actions button {
     width: 100%;
   }
 
-  .modal-overlay {
+  .user-manager .modal-overlay {
     padding: 10px;
   }
 
-  .modal-content {
+  .user-manager .modal-content {
     padding: 20px 16px;
   }
 
-  .modal-content h3 {
+  .user-manager .modal-content h3 {
     font-size: 18px;
   }
 }
 
 /* Category Assignment Modal */
-.category-modal {
+.user-manager .category-modal {
   max-width: 600px;
   max-height: 85vh;
   overflow-y: auto;
 }
 
-.modal-subtitle {
+.user-manager .modal-subtitle {
   color: var(--text-secondary);
   font-size: 14px;
   margin: -8px 0 20px 0;
 }
 
-.categories-list {
+.user-manager .categories-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -800,7 +800,7 @@
   margin: 12px 0;
 }
 
-.category-checkbox {
+.user-manager .category-checkbox {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -812,12 +812,12 @@
   transition: all 0.2s ease;
 }
 
-.category-checkbox:hover {
+.user-manager .category-checkbox:hover {
   background: var(--surface);
   border-color: var(--primary-color);
 }
 
-.category-checkbox input[type="checkbox"] {
+.user-manager .category-checkbox input[type="checkbox"] {
   margin-top: 2px;
   cursor: pointer;
   width: 18px;
@@ -825,36 +825,36 @@
   accent-color: var(--primary-color);
 }
 
-.category-name {
+.user-manager .category-name {
   font-weight: 600;
   color: var(--text-primary);
   flex: 1;
 }
 
-.category-description {
+.user-manager .category-description {
   display: block;
   font-size: 13px;
   color: var(--text-secondary);
   margin-top: 4px;
 }
 
-.no-categories {
+.user-manager .no-categories {
   text-align: center;
   color: var(--text-secondary);
   padding: 32px;
 }
 
-.selected-count {
+.user-manager .selected-count {
   margin-top: 12px;
   font-size: 14px;
   color: var(--text-secondary);
 }
 
-.selected-count strong {
+.user-manager .selected-count strong {
   color: var(--primary-color);
 }
 
-.btn-categories {
+.user-manager .btn-categories {
   background: var(--accent-color);
   color: white;
   border: none;
@@ -867,11 +867,11 @@
   margin-left: 8px;
 }
 
-.btn-categories:hover {
+.user-manager .btn-categories:hover {
   /* background: var(--accent-darker); */
   transform: translateY(-1px);
 }
 
-.btn-categories:active {
+.user-manager .btn-categories:active {
   transform: translateY(0);
 }

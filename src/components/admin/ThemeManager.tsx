@@ -137,7 +137,7 @@ export const ThemeManager = () => {
       <div className="theme-header">
         <h2>Zarządzanie motywami kolorystycznymi</h2>
         <button
-          className="btn-primary"
+          className="btn-add-theme"
           onClick={() => setShowForm(!showForm)}
         >
           {showForm ? 'Anuluj' : 'Dodaj motyw'}
@@ -219,7 +219,7 @@ export const ThemeManager = () => {
             <button type="submit" className="btn-primary">
               {editingTheme ? 'Zapisz zmiany' : 'Utwórz motyw'}
             </button>
-            <button type="button" className="btn-secondary" onClick={resetForm}>
+            <button type="button" className="btn-cancel-form" onClick={resetForm}>
               Anuluj
             </button>
           </div>
