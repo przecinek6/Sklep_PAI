@@ -19,6 +19,8 @@ export const ReportManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState<ReportStatus | 'all'>('pending');
   const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [userRole, setUserRole] = useState<string>('');
+  const [assignedCategories, setAssignedCategories] = useState<string[]>([]);
   const [selectedReport, setSelectedReport] = useState<ReportWithDetails | null>(null);
   const [messageText, setMessageText] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -34,13 +36,36 @@ export const ReportManagement = () => {
   }, []);
 
   useEffect(() => {
-    loadReports();
-  }, [currentPage, filter]);
+    if (userRole) {
+      loadReports();
+    }
+  }, [currentPage, filter, userRole, assignedCategories]);
 
   const loadCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setCurrentUserId(user.id);
+      
+      // Load user role
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile) {
+        setUserRole(profile.role);
+        
+        // Load assigned categories for moderators
+        if (profile.role === 'moderator') {
+          const { data: categories } = await supabase
+            .from('moderator_categories')
+            .select('category_id')
+            .eq('moderator_id', user.id);
+          
+          setAssignedCategories(categories?.map(c => c.category_id) || []);
+        }
+      }
     }
   };
 
@@ -63,7 +88,8 @@ export const ReportManagement = () => {
           products (
             id,
             name,
-            slug
+            slug,
+            category_id
           )
         `, { count: 'exact' })
         .order('created_at', { ascending: false });
@@ -82,8 +108,16 @@ export const ReportManagement = () => {
 
       if (error) throw error;
 
-      setReports(data || []);
-      setTotalCount(count || 0);
+      // Filter by assigned categories for moderators
+      let filteredData = data || [];
+      if (userRole === 'moderator' && assignedCategories.length > 0) {
+        filteredData = data?.filter(report => 
+          report.products?.category_id && assignedCategories.includes(report.products.category_id)
+        ) || [];
+      }
+
+      setReports(filteredData);
+      setTotalCount(userRole === 'moderator' && assignedCategories.length > 0 ? filteredData.length : (count || 0));
     } catch (error) {
       console.error('Error loading reports:', error);
       console.error('Błąd podczas ładowania zgłoszeń');

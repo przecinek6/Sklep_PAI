@@ -19,6 +19,8 @@ export const QuestionManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState<'unanswered' | 'answered' | 'all'>('unanswered');
   const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [userRole, setUserRole] = useState<string>('');
+  const [assignedCategories, setAssignedCategories] = useState<string[]>([]);
   const [answerText, setAnswerText] = useState<Record<string, string>>({});
   const [submittingAnswer, setSubmittingAnswer] = useState<string | null>(null);
 
@@ -33,13 +35,36 @@ export const QuestionManagement = () => {
   }, []);
 
   useEffect(() => {
-    loadQuestions();
-  }, [currentPage, filter]);
+    if (userRole) {
+      loadQuestions();
+    }
+  }, [currentPage, filter, userRole, assignedCategories]);
 
   const loadCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setCurrentUserId(user.id);
+      
+      // Load user role
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile) {
+        setUserRole(profile.role);
+        
+        // Load assigned categories for moderators
+        if (profile.role === 'moderator') {
+          const { data: categories } = await supabase
+            .from('moderator_categories')
+            .select('category_id')
+            .eq('moderator_id', user.id);
+          
+          setAssignedCategories(categories?.map(c => c.category_id) || []);
+        }
+      }
     }
   };
 
@@ -61,9 +86,11 @@ export const QuestionManagement = () => {
           products (
             id,
             name,
-            slug
+            slug,
+            category_id
           )
         `, { count: 'exact' })
+        .is('parent_id', null)
         .order('created_at', { ascending: false });
 
       // Apply filter
@@ -82,12 +109,20 @@ export const QuestionManagement = () => {
 
       if (error) throw error;
 
-      // Load answers for each question
-      if (data) {
+      // Filter by assigned categories for moderators
+      let filteredData = data || [];
+      if (userRole === 'moderator' && assignedCategories.length > 0) {
+        filteredData = data?.filter(question => 
+          question.products?.category_id && assignedCategories.includes(question.products.category_id)
+        ) || [];
+      }
+
+      // Load answers for each question (parent_id = question.id)
+      if (filteredData) {
         const questionsWithAnswers = await Promise.all(
-          data.map(async (question) => {
+          filteredData.map(async (question) => {
             const { data: answers } = await supabase
-              .from('product_question_answers')
+              .from('product_questions')
               .select(`
                 *,
                 user_profiles (
@@ -97,7 +132,7 @@ export const QuestionManagement = () => {
                   last_name
                 )
               `)
-              .eq('question_id', question.id)
+              .eq('parent_id', question.id)
               .order('created_at', { ascending: true });
 
             return { ...question, answers: answers || [] };
@@ -176,19 +211,22 @@ export const QuestionManagement = () => {
     setSubmittingAnswer(questionId);
 
     try {
-      // Insert answer
+      // Insert answer (get product_id from question first)
+      const question = questions.find(q => q.id === questionId);
+      if (!question) throw new Error('Question not found');
+
       const { error } = await supabase
-        .from('product_question_answers')
+        .from('product_questions')
         .insert({
-          question_id: questionId,
+          product_id: question.product_id,
           user_id: currentUserId,
-          answer: answer
+          parent_id: questionId,
+          content: answer
         });
 
       if (error) throw error;
 
       // Send email notification
-      const question = questions.find(q => q.id === questionId);
       if (question && question.user_profiles) {
         try {
           await sendQuestionEmail(question, answer);

@@ -19,6 +19,8 @@ export const ReviewModeration = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState<'pending' | 'approved' | 'all'>('pending');
   const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [userRole, setUserRole] = useState<string>('');
+  const [assignedCategories, setAssignedCategories] = useState<string[]>([]);
   const [sendingEmail, setSendingEmail] = useState(false);
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
@@ -32,13 +34,36 @@ export const ReviewModeration = () => {
   }, []);
 
   useEffect(() => {
-    loadReviews();
-  }, [currentPage, filter]);
+    if (userRole) {
+      loadReviews();
+    }
+  }, [currentPage, filter, userRole, assignedCategories]);
 
   const loadCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setCurrentUserId(user.id);
+      
+      // Load user role
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile) {
+        setUserRole(profile.role);
+        
+        // Load assigned categories for moderators
+        if (profile.role === 'moderator') {
+          const { data: categories } = await supabase
+            .from('moderator_categories')
+            .select('category_id')
+            .eq('moderator_id', user.id);
+          
+          setAssignedCategories(categories?.map(c => c.category_id) || []);
+        }
+      }
     }
   };
 
@@ -61,7 +86,8 @@ export const ReviewModeration = () => {
           products (
             id,
             name,
-            slug
+            slug,
+            category_id
           )
         `, { count: 'exact' })
         .eq('is_deleted', false)
@@ -72,6 +98,24 @@ export const ReviewModeration = () => {
         query = query.eq('is_approved', false);
       } else if (filter === 'approved') {
         query = query.eq('is_approved', true);
+      }
+
+      // Filter by assigned categories for moderators
+      if (userRole === 'moderator' && assignedCategories.length > 0) {
+        // Fetch reviews where product.category_id is in assigned categories
+        const { data: filteredReviews, error: reviewError, count } = await query;
+        
+        if (reviewError) throw reviewError;
+        
+        // Filter on client side (because we need to check nested products.category_id)
+        const filtered = filteredReviews?.filter(review => 
+          review.products?.category_id && assignedCategories.includes(review.products.category_id)
+        ) || [];
+        
+        setReviews(filtered);
+        setTotalCount(filtered.length);
+        setLoading(false);
+        return;
       }
 
       // Apply pagination
