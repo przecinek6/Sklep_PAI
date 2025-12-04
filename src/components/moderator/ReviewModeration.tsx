@@ -103,7 +103,7 @@ export const ReviewModeration = () => {
       // Filter by assigned categories for moderators
       if (userRole === 'moderator' && assignedCategories.length > 0) {
         // Fetch reviews where product.category_id is in assigned categories
-        const { data: filteredReviews, error: reviewError, count } = await query;
+        const { data: filteredReviews, error: reviewError } = await query;
         
         if (reviewError) throw reviewError;
         

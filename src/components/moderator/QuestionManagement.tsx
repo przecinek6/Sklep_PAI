@@ -182,7 +182,7 @@ export const QuestionManagement = () => {
             customerEmail: question.user_profiles.email,
             customerName: question.user_profiles.first_name || question.user_profiles.username,
             productName: question.products?.name,
-            questionText: question.question,
+            questionText: question.content,
             answerText: answer
           })
         }
@@ -325,7 +325,7 @@ export const QuestionManagement = () => {
 
                 <div className="question-content">
                   <p><strong>Pytanie:</strong></p>
-                  <p>{question.question}</p>
+                  <p>{question.content}</p>
                 </div>
 
                 {question.answers && question.answers.length > 0 && (
@@ -342,7 +342,7 @@ export const QuestionManagement = () => {
                             {new Date(answer.created_at).toLocaleDateString('pl-PL')}
                           </span>
                         </div>
-                        <p className="answer-text">{answer.answer}</p>
+                        <p className="answer-text">{answer.content}</p>
                       </div>
                     ))}
                   </div>

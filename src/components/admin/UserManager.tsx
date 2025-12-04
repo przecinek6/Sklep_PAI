@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Pagination } from '../Pagination';
 import { usePagination } from '../../hooks/usePagination';
-import type { UserProfile, UserRole, Category, ModeratorCategory } from '../../types/database.types';
+import type { UserProfile, UserRole, Category } from '../../types/database.types';
 import './UserManager.css';
 
 interface BanFormData {
