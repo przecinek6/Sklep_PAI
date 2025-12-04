@@ -366,6 +366,11 @@
   }
 }
 
+/* Mobile cards - hidden by default on desktop */
+.orders-mobile-cards {
+  display: none;
+}
+
 /* Mobilny układ kart zamiast tabeli */
 @media (max-width: 964px) {
   .orders-table table {
