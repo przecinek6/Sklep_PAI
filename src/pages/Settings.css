@@ -172,12 +172,12 @@
 }
 
 .theme-badge.current {
-  background-color: var(--primary);
+  background-color: var(--primary-color);
   color: white;
 }
 
 .theme-badge.preview {
-  background-color: var(--secondary);
+  background-color: var(--secondary-color);
   color: white;
 }
 

@@ -209,7 +209,7 @@
   transform: translateY(-50%);
   width: 4px;
   height: 70%;
-  background-color: var(--primary);
+  background-color: var(--primary-color);
   border-radius: 0 2px 2px 0;
 }
 
