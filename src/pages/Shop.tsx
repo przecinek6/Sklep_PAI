@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
@@ -28,6 +28,7 @@ interface Product {
 export const Shop = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const shopMainRef = useRef<HTMLElement>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -240,8 +241,17 @@ export const Shop = () => {
     const from = (page - 1) * productsPerPage;
     const to = from + productsPerPage - 1;
 
-    // Scroll to top of products section
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to top of shop-main section
+    if (shopMainRef.current) {
+      const navbarHeight = 60; // Wysokość navbara
+      const elementPosition = shopMainRef.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
 
     if (!selectedCategory) {
       // Load all products
@@ -334,7 +344,7 @@ export const Shop = () => {
       
       <FeaturedSlider products={featuredProducts} sliderName={sliderName} />
 
-      <main className="shop-main">
+      <main className="shop-main" ref={shopMainRef}>
         <div className="shop-container">
           {/* Sidebar - Categories */}
           <aside className="shop-sidebar">
