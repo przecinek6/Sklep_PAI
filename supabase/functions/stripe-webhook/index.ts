@@ -103,13 +103,19 @@ serve(async (req)=>{
             break;
           }
           // Create payment confirmation email notification
-          const { error: emailError } = await supabase.from('email_notifications').insert({
+          const title = `Płatność potwierdzona - zamówienie ${order.order_number}`;
+          const message = `Twoja płatność za zamówienie ${order.order_number} została potwierdzona.`;
+          
+          const { error: emailError } = await supabase.from('notifications').insert({
             user_id: order.user_id,
-            notification_type: 'payment_confirmed',
-            subject: `Płatność potwierdzona - zamówienie ${order.order_number}`,
-            body: `Twoja płatność za zamówienie ${order.order_number} została potwierdzona. Zamówienie jest w trakcie realizacji.`,
+            notification_type: 'payment_success',
+            title,
+            message,
+            delivery_method: 'email',
             email_to: userData.user.email,
-            status: 'pending',
+            email_subject: title,
+            email_body: `Twoja płatność za zamówienie ${order.order_number} została potwierdzona. Zamówienie jest w trakcie realizacji.`,
+            email_status: 'pending',
             metadata: {
               order_id: orderId,
               order_number: order.order_number,

@@ -27,7 +27,10 @@ serve(async (req) => {
         JSON.stringify({ error: 'Missing authorization header' }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
         }
       );
     }
@@ -45,7 +48,10 @@ serve(async (req) => {
     if (authError || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
       });
     }
 
@@ -65,7 +71,10 @@ serve(async (req) => {
         JSON.stringify({ error: 'Missing required fields' }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
         }
       );
     }
@@ -83,7 +92,10 @@ serve(async (req) => {
         JSON.stringify({ error: 'Order not found' }),
         {
           status: 404,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
         }
       );
     }
@@ -120,16 +132,24 @@ serve(async (req) => {
         <p>Zespół Tech Shop</p>
       `;
 
-    // Create notification record in database (status: pending)
+    // Create notification record in database
+    const title = subject;
+    const message = isSuccess
+      ? `Płatność za zamówienie #${orderNumber} została potwierdzona.`
+      : `Płatność za zamówienie #${orderNumber} nie powiodła się.`;
+    
     const { data: notification, error: notificationError } = await supabase
-      .from('email_notifications')
+      .from('notifications')
       .insert({
         user_id: user.id,
-        notification_type: isSuccess ? 'payment_confirmed' : 'payment_failed',
-        subject,
-        body,
+        notification_type: isSuccess ? 'payment_success' : 'payment_failed',
+        title,
+        message,
+        delivery_method: 'email',
         email_to: customerEmail,
-        status: 'pending',
+        email_subject: subject,
+        email_body: body,
+        email_status: 'pending',
         metadata: {
           order_id: orderId,
           order_number: orderNumber,
@@ -145,7 +165,10 @@ serve(async (req) => {
         JSON.stringify({ error: 'Failed to create notification' }),
         {
           status: 500,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
         }
       );
     }
@@ -159,7 +182,7 @@ serve(async (req) => {
           Authorization: `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: 'Tech Shop <onboarding@resend.dev>',
+          from: 'Tech Shop <noreply@przecinek.me>',
           to: customerEmail,
           subject: subject,
           html: body,
@@ -174,8 +197,11 @@ serve(async (req) => {
 
       // Update notification status to 'sent'
       await supabase
-        .from('email_notifications')
-        .update({ status: 'sent' })
+        .from('notifications')
+        .update({ 
+          email_status: 'sent',
+          email_sent_at: new Date().toISOString()
+        })
         .eq('id', notification.id);
 
       return new Response(
@@ -197,11 +223,12 @@ serve(async (req) => {
 
       // Update notification status to 'failed'
       await supabase
-        .from('email_notifications')
+        .from('notifications')
         .update({
-          status: 'failed',
-          error_message:
+          email_status: 'failed',
+          email_error_message:
             emailError instanceof Error ? emailError.message : 'Unknown error',
+          email_retry_count: (notification.email_retry_count || 0) + 1
         })
         .eq('id', notification.id);
 

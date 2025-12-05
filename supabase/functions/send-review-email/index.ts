@@ -25,7 +25,8 @@ serve(async (req)=>{
       }), {
         status: 401,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         }
       });
     }
@@ -40,7 +41,8 @@ serve(async (req)=>{
       }), {
         status: 401,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         }
       });
     }
@@ -55,7 +57,8 @@ serve(async (req)=>{
       }), {
         status: 403,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         }
       });
     }
@@ -69,12 +72,18 @@ serve(async (req)=>{
       }), {
         status: 400,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         }
       });
     }
     // Prepare email content
     const subject = approved ? `Twoja opinia została zaakceptowana` : `Twoja opinia została odrzucona`;
+    const title = subject;
+    const message = approved 
+      ? `Twoja opinia dla produktu ${productName || 'produktu'} została zaakceptowana i jest teraz widoczna publicznie.`
+      : `Twoja opinia dla produktu ${productName || 'produktu'} została odrzucona, ponieważ nie spełnia naszych wytycznych.`;
+    
     const body = approved ? `
         <h2>Opinia zaakceptowana</h2>
         <p>Witaj ${customerName || 'Kliencie'},</p>
@@ -90,14 +99,18 @@ serve(async (req)=>{
         <br>
         <p>Zespół Tech Shop</p>
       `;
-    // Create notification record in database (status: pending)
-    const { data: notification, error: notificationError } = await supabase.from('email_notifications').insert({
+    
+    // Create notification record in database (delivery_method: email)
+    const { data: notification, error: notificationError } = await supabase.from('notifications').insert({
       user_id: userId,
       notification_type: approved ? 'review_approved' : 'review_rejected',
-      subject,
-      body,
+      title,
+      message,
+      delivery_method: 'email',
       email_to: customerEmail,
-      status: 'pending',
+      email_subject: subject,
+      email_body: body,
+      email_status: 'pending',
       metadata: {
         review_id: reviewId,
         product_id: productId
@@ -110,7 +123,8 @@ serve(async (req)=>{
       }), {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         }
       });
     }
@@ -123,7 +137,7 @@ serve(async (req)=>{
           'Authorization': `Bearer ${RESEND_API_KEY}`
         },
         body: JSON.stringify({
-          from: 'Tech Shop <onboarding@resend.dev>',
+          from: 'Tech Shop <noreply@przecinek.me>',
           to: customerEmail,
           subject: subject,
           html: body
@@ -134,8 +148,9 @@ serve(async (req)=>{
         throw new Error(resendData.message || 'Failed to send email');
       }
       // Update notification status to 'sent'
-      await supabase.from('email_notifications').update({
-        status: 'sent'
+      await supabase.from('notifications').update({
+        email_status: 'sent',
+        email_sent_at: new Date().toISOString()
       }).eq('id', notification.id);
       return new Response(JSON.stringify({
         success: true,
@@ -151,9 +166,10 @@ serve(async (req)=>{
     } catch (emailError) {
       console.error('Error sending email:', emailError);
       // Update notification status to 'failed'
-      await supabase.from('email_notifications').update({
-        status: 'failed',
-        error_message: emailError instanceof Error ? emailError.message : 'Unknown error'
+      await supabase.from('notifications').update({
+        email_status: 'failed',
+        email_error_message: emailError instanceof Error ? emailError.message : 'Unknown error',
+        email_retry_count: notification.email_retry_count + 1
       }).eq('id', notification.id);
       return new Response(JSON.stringify({
         success: false,
