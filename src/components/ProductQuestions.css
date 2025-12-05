@@ -160,10 +160,17 @@
   margin-bottom: 16px;
 }
 
-.question-author {
+.product-questions .question-author {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-direction: row;
+}
+
+.product-questions .question-author .author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .author-avatar,
@@ -304,12 +311,13 @@
   padding-top: 20px;
   border-top: 1px solid var(--border);
   display: flex;
+  flex-direction: column;
   gap: 12px;
   align-items: flex-end;
 }
 
 .answer-form textarea {
-  flex: 1;
+  width: 100%;
   padding: 10px 14px;
   border: 2px solid var(--border);
   border-radius: var(--radius-md);

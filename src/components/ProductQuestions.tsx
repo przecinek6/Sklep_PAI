@@ -8,9 +8,10 @@ interface ProductQuestionsProps {
   productId: string;
   currentUserId?: string;
   userRole?: string;
+  categoryId?: string;
 }
 
-export const ProductQuestions = ({ productId, currentUserId, userRole }: ProductQuestionsProps) => {
+export const ProductQuestions = ({ productId, currentUserId, userRole, categoryId }: ProductQuestionsProps) => {
   const [questions, setQuestions] = useState<ProductQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<string, ProductQuestionAnswer[]>>({});
   const [loading, setLoading] = useState(true);
@@ -18,12 +19,51 @@ export const ProductQuestions = ({ productId, currentUserId, userRole }: Product
   const [answerTexts, setAnswerTexts] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isCategoryModerator, setIsCategoryModerator] = useState(false);
 
-  const isModerator = userRole === 'moderator' || userRole === 'admin';
+  const isModerator = isCategoryModerator || userRole === 'admin';
 
   useEffect(() => {
     loadQuestions();
   }, [productId]);
+
+  useEffect(() => {
+    if (currentUserId && categoryId) {
+      checkIfCategoryModerator();
+    }
+  }, [currentUserId, categoryId, userRole]);
+
+  const checkIfCategoryModerator = async () => {
+    if (!currentUserId || !categoryId) {
+      setIsCategoryModerator(false);
+      return;
+    }
+
+    try {
+      // Admin ma dostęp do wszystkiego
+      if (userRole === 'admin') {
+        setIsCategoryModerator(true);
+        return;
+      }
+
+      // Moderator - sprawdź w tabeli moderator_categories
+      if (userRole === 'moderator') {
+        const { data: moderatorCategory } = await supabase
+          .from('moderator_categories')
+          .select('category_id')
+          .eq('moderator_id', currentUserId)
+          .eq('category_id', categoryId)
+          .maybeSingle();
+
+        setIsCategoryModerator(!!moderatorCategory);
+      } else {
+        setIsCategoryModerator(false);
+      }
+    } catch (err) {
+      console.error('Error checking moderator status:', err);
+      setIsCategoryModerator(false);
+    }
+  };
 
   const loadQuestions = async () => {
     try {
@@ -221,7 +261,7 @@ export const ProductQuestions = ({ productId, currentUserId, userRole }: Product
                       {getUserDisplayName(question.user_profiles)[0].toUpperCase()}
                     </div>
                   )}
-                  <div>
+                  <div className="author-info">
                     <div className="author-name">{getUserDisplayName(question.user_profiles)}</div>
                     <span className="question-date">
                       {new Date(question.created_at).toLocaleDateString('pl-PL', {
