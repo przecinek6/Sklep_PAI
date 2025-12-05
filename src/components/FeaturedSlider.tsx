@@ -7,6 +7,7 @@ interface Product {
   id: string;
   name: string;
   slug: string;
+  description: string;
   price: number;
   image_url?: string;
 }
@@ -104,7 +105,7 @@ export const FeaturedSlider = ({ products, sliderName = 'Wyróżnione produkty' 
                   </div>
                   <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
-                    <p className="product-price">{product.price.toFixed(2)} zł</p>
+                    <p className="product-description">{product.description}</p>
                   </div>
                 </div>
               ))}

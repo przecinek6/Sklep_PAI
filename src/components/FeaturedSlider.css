@@ -38,10 +38,13 @@
   flex: 1;
   overflow: hidden;
   border-radius: 12px;
+  display: grid;
 }
 
 .slider-content {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - (4 * 16px)) / 5);
   gap: 16px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -77,13 +80,14 @@
 
 /* Product Card */
 .product-card {
-  flex: 0 0 calc((100% - (4 * 16px)) / 5);
   background: var(--background);
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card:hover {
@@ -115,23 +119,29 @@
 
 .product-info {
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .product-name {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 8px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin: 0 0 12px 0;
 }
 
-.product-price {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--primary-color);
+.featured-slider .product-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
   margin: 0;
+  display: block;
+  overflow: visible;
+  text-overflow: unset;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  -webkit-box-orient: unset;
 }
 
 /* Indicators */
@@ -165,8 +175,8 @@
 
 /* Responsive */
 @media (max-width: 1280px) {
-  .product-card {
-    flex: 0 0 calc((100% - (3 * 16px)) / 4);
+  .slider-content {
+    grid-auto-columns: calc((100% - (3 * 16px)) / 4);
   }
 }
 
@@ -182,10 +192,7 @@
 
   .slider-content {
     gap: 12px;
-  }
-
-  .product-card {
-    flex: 0 0 calc((100% - (2 * 12px)) / 3);
+    grid-auto-columns: calc((100% - (2 * 12px)) / 3);
   }
 }
 
@@ -220,12 +227,12 @@
     font-size: 14px;
   }
 
-  .product-price {
-    font-size: 16px;
+  .featured-slider .product-description {
+    font-size: 13px;
   }
 
-  .product-card {
-    flex: 0 0 calc((100% - 12px) / 2);
+  .slider-content {
+    grid-auto-columns: calc((100% - 12px) / 2);
   }
 }
 
@@ -244,11 +251,8 @@
     height: 20px;
   }
 
-  .product-card {
-    flex: 0 0 100%;
-  }
-
   .slider-content {
     gap: 16px;
+    grid-auto-columns: 100%;
   }
 }
