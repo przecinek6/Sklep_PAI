@@ -66,6 +66,8 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists trigger_notify_order_status_change on orders;
+
 create trigger trigger_notify_order_status_change
 after update on orders
 for each row
@@ -135,6 +137,8 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists trigger_notify_payment_status_change on orders;
+
 create trigger trigger_notify_payment_status_change
 after update on orders
 for each row
@@ -184,26 +188,222 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists trigger_notify_review_moderation on product_reviews;
+
 create trigger trigger_notify_review_moderation
 after update on product_reviews
 for each row
 execute function notify_review_moderation();
 
 
--- 4. Notification when question is answered
+-- 4. Notification to moderators when new review is submitted
+-- ========================================
+create or replace function notify_moderators_new_review()
+returns trigger as $$
+declare
+  v_product record;
+  v_moderator_count integer := 0;
+  v_admin_count integer := 0;
+begin
+  -- Get product details
+  select id, name, slug, category_id
+  into v_product
+  from products
+  where id = new.product_id;
+
+  if v_product.id is null then
+    raise warning 'Product not found for review %', new.id;
+    return new;
+  end if;
+
+  -- Notify all moderators assigned to this category
+  insert into notifications (
+    user_id,
+    notification_type,
+    title,
+    message,
+    link,
+    metadata
+  )
+  select 
+    mc.moderator_id,
+    'new_review',
+    'Nowa opinia do moderacji',
+    'Dodano nową opinię o produkcie "' || v_product.name || '" w kategorii, którą moderujesz.',
+    '/moderator-panel?tab=reviews',
+    jsonb_build_object(
+      'review_id', new.id,
+      'product_id', v_product.id,
+      'product_name', v_product.name,
+      'category_id', v_product.category_id
+    )
+  from moderator_categories mc
+  where mc.category_id = v_product.category_id;
+
+  get diagnostics v_moderator_count = row_count;
+
+  -- Also notify all admins
+  insert into notifications (
+    user_id,
+    notification_type,
+    title,
+    message,
+    link,
+    metadata
+  )
+  select 
+    up.id,
+    'new_review',
+    'Nowa opinia do moderacji',
+    'Dodano nową opinię o produkcie "' || v_product.name || '".',
+    '/moderator-panel?tab=reviews',
+    jsonb_build_object(
+      'review_id', new.id,
+      'product_id', v_product.id,
+      'product_name', v_product.name,
+      'category_id', v_product.category_id
+    )
+  from user_profiles up
+  where up.role = 'admin';
+
+  get diagnostics v_admin_count = row_count;
+
+  raise notice 'Review notifications: % moderators, % admins', v_moderator_count, v_admin_count;
+
+  return new;
+exception when others then
+  raise warning 'Error in notify_moderators_new_review: %', SQLERRM;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists trigger_notify_moderators_new_review on product_reviews;
+
+create trigger trigger_notify_moderators_new_review
+after insert on product_reviews
+for each row
+execute function notify_moderators_new_review();
+
+
+-- 5. Notification to moderators when new question is asked
+-- ========================================
+create or replace function notify_moderators_new_question()
+returns trigger as $$
+declare
+  v_product record;
+  v_moderator_count integer := 0;
+  v_admin_count integer := 0;
+begin
+  -- Only notify for top-level questions (not answers)
+  if new.parent_id is not null then
+    return new;
+  end if;
+
+  -- Get product details
+  select id, name, slug, category_id
+  into v_product
+  from products
+  where id = new.product_id;
+
+  if v_product.id is null then
+    raise warning 'Product not found for question %', new.id;
+    return new;
+  end if;
+
+  -- Notify all moderators assigned to this category
+  insert into notifications (
+    user_id,
+    notification_type,
+    title,
+    message,
+    link,
+    metadata
+  )
+  select 
+    mc.moderator_id,
+    'new_question',
+    'Nowe pytanie do odpowiedzi',
+    'Dodano nowe pytanie o produkt "' || v_product.name || '" w kategorii, którą moderujesz.',
+    '/moderator-panel?tab=questions',
+    jsonb_build_object(
+      'question_id', new.id,
+      'product_id', v_product.id,
+      'product_name', v_product.name,
+      'category_id', v_product.category_id
+    )
+  from moderator_categories mc
+  where mc.category_id = v_product.category_id;
+
+  get diagnostics v_moderator_count = row_count;
+
+  -- Also notify all admins
+  insert into notifications (
+    user_id,
+    notification_type,
+    title,
+    message,
+    link,
+    metadata
+  )
+  select 
+    up.id,
+    'new_question',
+    'Nowe pytanie do odpowiedzi',
+    'Dodano nowe pytanie o produkt "' || v_product.name || '".',
+    '/moderator-panel?tab=questions',
+    jsonb_build_object(
+      'question_id', new.id,
+      'product_id', v_product.id,
+      'product_name', v_product.name,
+      'category_id', v_product.category_id
+    )
+  from user_profiles up
+  where up.role = 'admin';
+
+  get diagnostics v_admin_count = row_count;
+
+  raise notice 'Question notifications: % moderators, % admins', v_moderator_count, v_admin_count;
+
+  return new;
+exception when others then
+  raise warning 'Error in notify_moderators_new_question: %', SQLERRM;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists trigger_notify_moderators_new_question on product_questions;
+
+create trigger trigger_notify_moderators_new_question
+after insert on product_questions
+for each row
+execute function notify_moderators_new_question();
+
+
+-- 6. Notification when question is answered
 -- ========================================
 create or replace function notify_question_answered()
 returns trigger as $$
 declare
   v_question_user_id uuid;
   v_product_name varchar(255);
+  v_product_slug varchar(255);
 begin
-  -- Get the user who asked the question and product name
-  select pq.user_id, p.name
-  into v_question_user_id, v_product_name
+  -- Only notify for answers (not top-level questions)
+  if new.parent_id is null then
+    return new;
+  end if;
+
+  -- Get the user who asked the question and product details
+  select pq.user_id, p.name, p.slug
+  into v_question_user_id, v_product_name, v_product_slug
   from product_questions pq
   join products p on p.id = pq.product_id
-  where pq.id = new.question_id;
+  where pq.id = new.parent_id;
+
+  -- Don't notify if user is answering their own question
+  if v_question_user_id = new.user_id then
+    return new;
+  end if;
 
   -- Insert notification for the question author
   insert into notifications (
@@ -218,14 +418,10 @@ begin
     'question_answered',
     'Odpowiedź na Twoje pytanie',
     'Otrzymałeś odpowiedź na pytanie dotyczące produktu "' || v_product_name || '".',
-    '/product/' || (
-      select slug from products p 
-      join product_questions pq on pq.product_id = p.id 
-      where pq.id = new.question_id
-    ),
+    '/product/' || v_product_slug,
     jsonb_build_object(
       'answer_id', new.id,
-      'question_id', new.question_id,
+      'question_id', new.parent_id,
       'product_name', v_product_name
     )
   );
@@ -234,13 +430,15 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists trigger_notify_question_answered on product_questions;
+
 create trigger trigger_notify_question_answered
-after insert on product_question_answers
+after insert on product_questions
 for each row
 execute function notify_question_answered();
 
 
--- 5. Notification when moderator responds to a report
+-- 7. Notification when moderator responds to a report
 -- ========================================
 create or replace function notify_report_response()
 returns trigger as $$
@@ -286,6 +484,8 @@ begin
   return new;
 end;
 $$ language plpgsql;
+
+drop trigger if exists trigger_notify_report_response on report_messages;
 
 create trigger trigger_notify_report_response
 after insert on report_messages

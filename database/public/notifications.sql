@@ -38,6 +38,8 @@ create table public.notifications (
             'payment_failed'::character varying,
             'review_approved'::character varying,
             'review_rejected'::character varying,
+            'new_review'::character varying,
+            'new_question'::character varying,
             'question_answered'::character varying,
             'report_response'::character varying,
             'product_added'::character varying,

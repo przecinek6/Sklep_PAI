@@ -139,7 +139,7 @@ export const ProductQuestions = ({ productId, currentUserId, userRole, categoryI
       setError(null);
       setSuccess(null);
 
-      const { error: insertError } = await supabase
+      const { data, error: insertError } = await supabase
         .from('product_questions')
         .insert({
           product_id: productId,
@@ -148,12 +148,16 @@ export const ProductQuestions = ({ productId, currentUserId, userRole, categoryI
           content: newQuestion.trim(),
         });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        throw insertError;
+      }
 
       setSuccess('Pytanie zostało dodane');
       setNewQuestion('');
       await loadQuestions();
     } catch (err) {
+      console.error('Error submitting question:', err);
       setError(err instanceof Error ? err.message : 'Błąd podczas dodawania pytania');
     }
   };

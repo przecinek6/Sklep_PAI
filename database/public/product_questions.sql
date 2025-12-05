@@ -51,3 +51,34 @@ execute function update_question_answered_status();
 create trigger update_product_questions_updated_at BEFORE
 update on product_questions for EACH row
 execute FUNCTION update_updated_at_column ();
+
+-- ========================================
+-- ROW LEVEL SECURITY (RLS)
+-- ========================================
+
+-- Enable RLS
+alter table product_questions enable row level security;
+
+-- Policy: Anyone can view questions and answers
+create policy "Anyone can view questions and answers"
+  on product_questions for select
+  using (true);
+
+-- Policy: Authenticated users can insert questions
+create policy "Authenticated users can insert questions"
+  on product_questions for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+-- Policy: Users can update their own questions
+create policy "Users can update their own questions"
+  on product_questions for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+-- Policy: Users can delete their own questions
+create policy "Users can delete their own questions"
+  on product_questions for delete
+  to authenticated
+  using (auth.uid() = user_id);
