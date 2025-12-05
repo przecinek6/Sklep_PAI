@@ -7,9 +7,10 @@ import './ProductReviews.css';
 interface ProductReviewsProps {
   productId: string;
   currentUserId?: string;
+  categoryId?: string;
 }
 
-export const ProductReviews = ({ productId, currentUserId }: ProductReviewsProps) => {
+export const ProductReviews = ({ productId, currentUserId, categoryId }: ProductReviewsProps) => {
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [userReview, setUserReview] = useState<ProductReview | null>(null);
   const [loading, setLoading] = useState(true);
@@ -21,14 +22,59 @@ export const ProductReviews = ({ productId, currentUserId }: ProductReviewsProps
   const [userVotes, setUserVotes] = useState<Record<string, ReviewVote>>({});
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isCategoryModerator, setIsCategoryModerator] = useState(false);
 
   useEffect(() => {
     loadReviews();
     if (currentUserId) {
       loadUserReview();
       loadUserVotes();
+      checkIfCategoryModerator();
     }
-  }, [productId, currentUserId]);
+  }, [productId, currentUserId, categoryId]);
+
+  const checkIfCategoryModerator = async () => {
+    if (!currentUserId || !categoryId) {
+      setIsCategoryModerator(false);
+      return;
+    }
+
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', currentUserId)
+        .single();
+
+      if (!profile) {
+        setIsCategoryModerator(false);
+        return;
+      }
+
+      // Admin ma dostęp do wszystkiego
+      if (profile.role === 'admin') {
+        setIsCategoryModerator(true);
+        return;
+      }
+
+      // Moderator - sprawdź w tabeli moderator_categories
+      if (profile.role === 'moderator') {
+        const { data: moderatorCategory } = await supabase
+          .from('moderator_categories')
+          .select('category_id')
+          .eq('moderator_id', currentUserId)
+          .eq('category_id', categoryId)
+          .maybeSingle();
+
+        setIsCategoryModerator(!!moderatorCategory);
+      } else {
+        setIsCategoryModerator(false);
+      }
+    } catch (err) {
+      console.error('Error checking moderator status:', err);
+      setIsCategoryModerator(false);
+    }
+  };
 
   const loadReviews = async () => {
     try {
@@ -434,7 +480,7 @@ export const ProductReviews = ({ productId, currentUserId }: ProductReviewsProps
                       {getUserDisplayName(review.user_profiles)[0].toUpperCase()}
                     </div>
                   )}
-                  <div>
+                  <div className="author-info">
                     <div className="author-name">{getUserDisplayName(review.user_profiles)}</div>
                     {renderStars(review.rating)}
                   </div>
@@ -464,6 +510,30 @@ export const ProductReviews = ({ productId, currentUserId }: ProductReviewsProps
                     >
                       <ThumbsDown size={16} />
                       <span>{review.not_helpful_count}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {currentUserId && (review.user_id === currentUserId || isCategoryModerator) && (
+                <div className="review-footer">
+                  <span></span>
+                  <div className="review-actions">
+                    {review.user_id === currentUserId && (
+                      <button
+                        className="btn-icon"
+                        onClick={() => handleEditReview(review)}
+                        title="Edytuj opinię"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                    )}
+                    <button
+                      className="btn-icon danger"
+                      onClick={() => handleDeleteReview(review.id)}
+                      title="Usuń opinię"
+                    >
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
