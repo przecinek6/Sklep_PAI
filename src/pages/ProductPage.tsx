@@ -373,12 +373,14 @@ export const ProductPage = () => {
         <ProductReviews 
           productId={product.id}
           currentUserId={currentUser?.id}
+          categoryId={product.category_id}
         />
 
         <ProductQuestions 
           productId={product.id}
           currentUserId={currentUser?.id}
           userRole={currentUser?.role}
+          categoryId={product.category_id}
         />
       </div>
 
