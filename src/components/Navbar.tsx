@@ -308,7 +308,7 @@ export const Navbar = () => {
                     {(userRole === 'moderator' || userRole === 'admin') && (
                       <>
                         <div className="dropdown-divider"></div>
-                        <Link to="/moderator" className="dropdown-item moderator" onClick={() => setDropdownOpen(false)}>
+                        <Link to="/moderator-panel" className="dropdown-item moderator" onClick={() => setDropdownOpen(false)}>
                           <ShieldCheck size={18} />
                           <span>Panel moderatora</span>
                         </Link>
