@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { ProductReview, UserProfile, Product } from '../../types/database.types';
 import { Pagination } from '../Pagination';
+import { Trash2 } from 'lucide-react';
 import './ReviewModeration.css';
 
 const ITEMS_PER_PAGE = 20;
@@ -254,6 +255,27 @@ export const ReviewModeration = () => {
     }
   };
 
+  const deleteReview = async (reviewId: string) => {
+    if (!confirm('Czy na pewno chcesz usunąć tę opinię? Ta operacja jest nieodwracalna.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('product_reviews')
+        .update({ is_deleted: true })
+        .eq('id', reviewId);
+
+      if (error) throw error;
+
+      await loadReviews();
+      console.log('Opinia została usunięta');
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      console.error('Błąd podczas usuwania opinii');
+    }
+  };
+
   const renderStars = (rating: number) => {
     return (
       <div className="stars-display">
@@ -361,24 +383,34 @@ export const ReviewModeration = () => {
                   </span>
                 </div>
 
-                {!review.is_approved && (
-                  <div className="review-actions">
+                <div className="review-actions">
+                  {!review.is_approved ? (
+                    <>
+                      <button
+                        onClick={() => approveReview(review.id)}
+                        className="btn-approve"
+                        disabled={sendingEmail}
+                      >
+                        ✓ Zaakceptuj
+                      </button>
+                      <button
+                        onClick={() => rejectReview(review.id)}
+                        className="btn-reject"
+                        disabled={sendingEmail}
+                      >
+                        ✗ Odrzuć
+                      </button>
+                    </>
+                  ) : (
                     <button
-                      onClick={() => approveReview(review.id)}
-                      className="btn-approve"
+                      onClick={() => deleteReview(review.id)}
+                      className="btn-delete"
                       disabled={sendingEmail}
                     >
-                      ✓ Zaakceptuj
+                      <Trash2 size={16} /> Usuń
                     </button>
-                    <button
-                      onClick={() => rejectReview(review.id)}
-                      className="btn-reject"
-                      disabled={sendingEmail}
-                    >
-                      ✗ Odrzuć
-                    </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             ))}
           </div>
