@@ -139,7 +139,7 @@ export const ProductQuestions = ({ productId, currentUserId, userRole, categoryI
       setError(null);
       setSuccess(null);
 
-      const { data, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('product_questions')
         .insert({
           product_id: productId,
