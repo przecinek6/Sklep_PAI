@@ -66,7 +66,7 @@ function App() {
             element={user ? <Settings /> : <Navigate to="/login" replace />}
           />
           <Route
-            path="/moderator"
+            path="/moderator-panel"
             element={user ? <ModeratorPanel /> : <Navigate to="/login" replace />}
           />
           <Route
